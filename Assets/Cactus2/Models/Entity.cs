@@ -46,4 +46,6 @@ public class Entity : IEntity
     {
 
     }
+
+    protected Vector3 GetLocalVelocity() => Quaternion.Inverse(Rotation) * Velocity;
 }

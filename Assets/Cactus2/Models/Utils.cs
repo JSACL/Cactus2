@@ -48,4 +48,21 @@ public static class Utils
             @this.Rotate(delta);
         }
     }
+
+    public static float Shinkansen300(float x) => x switch
+    {
+        <= 0 => 1,
+        <= 0.75f => 1 - (2 / 3f) * x,
+        <= 1f => 2 - 2 * x,
+        _ => 0
+    };
+
+    public static float PullUp(float x) => x switch
+    {
+        <= -1 => -1,
+        >= 1 => 1,
+        _ => x
+    };
+
+    public static float Confine(float x, float min, float max) => x < min ? min : x > max ? max : x;
 }

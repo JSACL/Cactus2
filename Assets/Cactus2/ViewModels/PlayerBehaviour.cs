@@ -16,10 +16,10 @@ public class PlayerBehaviour : MonoBehaviour
     const float ADJUSTMENT_PROMPTNESS = 0.001f;
 
     IPlayer? _model;
-    vec _position = vec.zero;
-    Quaternion _rotation = Quaternion.identity;
-    vec _velocity = vec.zero;
-    vec _anugularVelocity = vec.zero;
+    //vec _position = vec.zero;
+    //Quaternion _rotation = Quaternion.identity;
+    //vec _velocity = vec.zero;
+    //vec _anugularVelocity = vec.zero;
     Rigidbody _rigidbody = null!;
     TriggerSensor _footSensor = null!;
     Animator _animator = null!;
@@ -60,11 +60,13 @@ public class PlayerBehaviour : MonoBehaviour
         Assert(Model is not null);
 
         // VM -> M のターン
-        var pos_neo = Model!.Position + (transform.position - _position);
-        var rot_neo = (Quaternion.Inverse(_rotation) * transform.rotation) * Model.Rotation;
-        Model.AddTime(Time.deltaTime);
-        Model.Position = pos_neo;//(transform.position - _position) - (pos - Model.Position);
-        Model.Rotation = rot_neo;
+        //var pos_neo = Model!.Position + (transform.position - _position);
+        //var rot_neo = (Quaternion.Inverse(_rotation) * transform.rotation) * Model.Rotation;
+        Model!.AddTime(Time.deltaTime);
+        //Model.Position = pos_neo;//(transform.position - _position) - (pos - Model.Position);
+        //Model.Rotation = rot_neo;
+        Model.Velocity = _rigidbody.velocity;
+        Model.AngularVelocity = _rigidbody.angularVelocity;
         Model.FootIsOn = _footSensor.IsOn;
         if (GetKeyDown(KeyCode.Space)) Model.Input(Action.Jump);
         if (GetMouseButtonDown(0)) Model.Input(Action.Func0);
@@ -73,14 +75,20 @@ public class PlayerBehaviour : MonoBehaviour
 
         // M -> VM のターン
         var rate = 1 - Exp(-ADJUSTMENT_PROMPTNESS * Time.deltaTime);
-        _position += rate * (Model.Position - _position);
-        _rotation = Quaternion.Euler(rate * (Quaternion.Inverse(_rotation) * Model.Rotation).eulerAngles) * _rotation;
-        _rigidbody.constraints = Model.Constraints;
-        Log(message: $": {Model.Force_leg}");
-        _rigidbody.AddForce(Model.Force_leg * 100);
+        //_rigidbody.position += rate * (Model.Position - _rigidbody.position);
+        _rigidbody.rotation = Quaternion.Euler(rate * (Quaternion.Inverse(_rigidbody.rotation) * Model.Rotation).eulerAngles) * _rigidbody.rotation;
+        //_rigidbody.velocity = Model.Velocity;
+        _rigidbody.angularVelocity = Model.AngularVelocity;
 
         // VM -> V を発動
-        //Bind();
+        Bind();
+        _rigidbody.constraints = Model.Constraints;
+        _rigidbody.AddForce(Model!.Force_leg);
+    }
+
+    void FixedUpdate()
+    {
+        Assert(Model is not null);
     }
 
     void Adjust(float rate = 1)
@@ -93,25 +101,25 @@ public class PlayerBehaviour : MonoBehaviour
 
         // 位置合わせ
         {
-            var delta = rate * (Model!.Position - _position);
+            var delta = rate * (Model!.Position - _rigidbody.position);
 
-            _position += delta;
+            _rigidbody.position += delta;
         }
 
         // 回転合わせ
         {
-            var delta = rate * (Quaternion.Inverse(_rotation) * Model.Rotation).eulerAngles;
+            var delta = rate * (Quaternion.Inverse(_rigidbody.rotation) * Model.Rotation).eulerAngles;
 
-            _rotation = Quaternion.Euler(delta) * _rotation;
+            _rigidbody.rotation = Quaternion.Euler(delta) * _rigidbody.rotation;
         }
     }
 
     void Bind()
     {
-        _rigidbody.position = _position;
-        _rigidbody.rotation = _rotation;
-        _rigidbody.velocity = _velocity;
-        _rigidbody.angularVelocity = _anugularVelocity;
+        //_rigidbody.position = _position;
+        //_rigidbody.rotation = _rotation;
+        //_rigidbody.velocity = _velocity;
+        //_rigidbody.angularVelocity = _anugularVelocity;
     }
 
     void TransitBodyAnimation(object? sender, AnimationTransitionEventArgs e)

@@ -10,8 +10,9 @@ using vec = UnityEngine.Vector3;
 public class Player : Humanoid, IPlayer
 {
     const int JUMP_DELAY_MS = 100;
-    const float STOP_PROMPTNESS = 0.001f;
-    const float MOVEMENT_PROMPTNESS = 1f;
+    const float STOP_PROMPTNESS = 100f;
+    const float MOVEMENT_PROMPTNESS = 20.0f;
+    const float STOP_PULL_UP_COEF = 0.2f;
 
     public void Move(vec direction)
     {
@@ -26,16 +27,22 @@ public class Player : Humanoid, IPlayer
         // ê^ãUìIìÆçÏ...âüÇµÇƒÇÈä‘Ç∏Ç¡Ç∆ÇÃÇ‚Ç¬
         if (FootIsOn)
         {
-            var f_stop = true;
-            if (GetKey(KeyCode.W))//GetButton(A_N_MOV_FORWARD))
+            switch (
+                GetKey(KeyCode.W),
+                GetKey(KeyCode.S))
             {
+            case (true, false):
                 Force_leg += e.DeltaTime * MOVEMENT_PROMPTNESS * vec.forward;
-                f_stop = false;
-            }
-            if (GetKey(KeyCode.S))//GetButton(A_N_MOV_BACKWARD))
-            {
-                Force_leg -= e.DeltaTime * MOVEMENT_PROMPTNESS * vec.back;
-                f_stop = false;
+                break;
+            case (false, true):
+                Force_leg += e.DeltaTime * MOVEMENT_PROMPTNESS * vec.back;
+                break;
+            case (false, false):
+                var f = Force_leg;
+                var v = vec.Dot(Velocity, Rotation * vec.forward);
+                f.z = e.DeltaTime * -STOP_PROMPTNESS * PullUp(STOP_PULL_UP_COEF * v);
+                Force_leg = f;
+                break;
             }
             switch (
                 GetKey(KeyCode.A),//GetButton(A_N_MOV_LEFT), 
@@ -43,16 +50,16 @@ public class Player : Humanoid, IPlayer
             {
             case (true, false):
                 Force_leg += e.DeltaTime * MOVEMENT_PROMPTNESS * vec.left;
-                f_stop = false;
                 break;
             case (false, true):
                 Force_leg += e.DeltaTime * MOVEMENT_PROMPTNESS * vec.right;
-                f_stop = false;
                 break;
-            }
-            if (f_stop)
-            {
-                Force_leg *= e.DeltaTime * STOP_PROMPTNESS;
+            case (false, false):
+                var f = Force_leg;
+                var v = vec.Dot(Velocity, Rotation * vec.right);
+                f.x = e.DeltaTime * -STOP_PROMPTNESS * PullUp(STOP_PULL_UP_COEF * v);
+                Force_leg = f;
+                break;
             }
         }
 
