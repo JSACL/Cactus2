@@ -58,6 +58,7 @@ public class Humanoid : Animal, IHumanoid
             }
         }
     }
+    public Quaternion HeadRotation { get; set; } = Quaternion.identity;
 
     protected override void Elapsed(object? sender, ElapsedEventArgs e)
     {

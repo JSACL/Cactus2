@@ -9,21 +9,30 @@ using static ConstantValues;
 using static UnityEngine.Input;
 using static Utils;
 using vec = UnityEngine.Vector3;
+using qtn = UnityEngine.Quaternion;
 
 // View-Model
 public class PlayerBehaviour : MonoBehaviour
 {
-    const float ADJUSTMENT_PROMPTNESS = 0.001f;
+    const float ADJUSTMENT_PROMPTNESS = 120f;
 
     IPlayer? _model;
-    //vec _position = vec.zero;
-    //Quaternion _rotation = Quaternion.identity;
-    //vec _velocity = vec.zero;
-    //vec _anugularVelocity = vec.zero;
+    [SerializeField]
+    vec _position = vec.zero;
+    [SerializeField]
+    qtn _rotation = qtn.identity;
+    [SerializeField]
     Rigidbody _rigidbody = null!;
+    [SerializeField]
     TriggerSensor _footSensor = null!;
+    [SerializeField]
     Animator _animator = null!;
+    [SerializeField]
     Camera _camera = null!;
+
+    // rigidbodyはView用の状態を持つ(ViewModel)
+    // ただしこれはPlayerの状態というより3dモデルの状態。
+    // なので別にPlayerとしてのView用の状態=position, rotationを持ち、惰してrigidbodyのそれと一致させる(←これは必然ではない！)
 
     public IPlayer? Model
     {
@@ -42,6 +51,20 @@ public class PlayerBehaviour : MonoBehaviour
             }
         }
     }
+    protected vec Position
+    {
+        get => _position;
+        set => _position = value;
+    }
+    protected qtn Rotation
+    {
+        get => _rotation;
+        set => _rotation = value;
+    }
+    protected vec MousePosition { get; private set; }
+    protected vec Velocity { get; set; }
+    protected vec AngularVelocity { get; set; }
+    protected Rigidbody Rigidbody => _rigidbody;
 
     void Start()
     {
@@ -59,76 +82,81 @@ public class PlayerBehaviour : MonoBehaviour
     {
         Assert(Model is not null);
 
-        // VM -> M のターン
-        //var pos_neo = Model!.Position + (transform.position - _position);
-        //var rot_neo = (Quaternion.Inverse(_rotation) * transform.rotation) * Model.Rotation;
-        Model!.AddTime(Time.deltaTime);
-        //Model.Position = pos_neo;//(transform.position - _position) - (pos - Model.Position);
-        //Model.Rotation = rot_neo;
-        Model.Velocity = _rigidbody.velocity;
-        Model.AngularVelocity = _rigidbody.angularVelocity;
-        Model.FootIsOn = _footSensor.IsOn;
-        if (GetKeyDown(KeyCode.Space)) Model.Input(Action.Jump);
-        if (GetMouseButtonDown(0)) Model.Input(Action.Func0);
-        if (GetMouseButtonDown(1)) Model.Input(Action.Func1);
-        if (GetMouseButtonDown(2)) Model.Input(Action.Func2);
+        // V -> VM
+        var pos_l = Position;
+        var rot_l = Rotation;
+        var mPos_l = MousePosition;
+        Position = Rigidbody.position;
+        Rotation = Rigidbody.rotation;
+        Velocity = Rigidbody.velocity;
+        AngularVelocity = Rigidbody.angularVelocity;
+        MousePosition = mousePosition;
+        //Log(false, MousePosition);
 
-        // M -> VM のターン
+        // VM -> M
+        var pos_neo = Model.Position + (Position - pos_l); // 1: 先に計算
+        var rot_neo = (qtn.Inverse(rot_l) * Rotation) * Model.Rotation; // 1:
+        //Model.Position += Position - pos_l; // 2: 相手を考慮して計算
+        //Model.Rotation = (Quaternion.Inverse(rot_l) * Rotation) * Model.Rotation; // 2:
+        Model.Velocity = Velocity;
+        Model.AngularVelocity = AngularVelocity;
+        Model.AddTime(Time.deltaTime);
+        Model.Position = pos_neo;// 1:打ち消して無効化
+        Model.Rotation = rot_neo;// 1:
+        Model.FootIsOn = _footSensor.Count >= 2; // TODO: tagで
+        //Model.Input(Action.HorizontalRotation, MousePosition.x - mPos_l.x);
+        //Model.Input(Action.VerticalRotation, MousePosition.y - mPos_l.y);
+        Model.Input(Action.HorizontalRotation, GetKey(KeyCode.RightArrow) ? 100 : GetKey(KeyCode.LeftArrow) ? -100 : 0);
+        Model.Input(Action.VerticalRotation, GetKey(KeyCode.UpArrow) ? -100 : GetKey(KeyCode.DownArrow) ? 100 : 0);
+        if (GetKeyDown(KeyCode.Space)) Model.Input(Action.Jump, Time.deltaTime);
+        if (GetMouseButtonDown(0)) Model.Input(Action.Func0, Time.deltaTime);
+        if (GetMouseButtonDown(1)) Model.Input(Action.Func1, Time.deltaTime);
+        if (GetMouseButtonDown(2)) Model.Input(Action.Func2, Time.deltaTime);
+
+        // TODO: 場違いなの何とかしてほしい
+        ResetMousePosition();
+
+        // M -> VM
         var rate = 1 - Exp(-ADJUSTMENT_PROMPTNESS * Time.deltaTime);
-        //_rigidbody.position += rate * (Model.Position - _rigidbody.position);
-        _rigidbody.rotation = Quaternion.Euler(rate * (Quaternion.Inverse(_rigidbody.rotation) * Model.Rotation).eulerAngles) * _rigidbody.rotation;
-        //_rigidbody.velocity = Model.Velocity;
-        _rigidbody.angularVelocity = Model.AngularVelocity;
+        // transformをmodelへ適かす。
+        Position += rate * (Model.Position - Position);
+        Rotation = (qtn.Inverse(Rotation) * Model.Rotation).Multiply(by: rate) * Rotation;
+        Debug.Log($"{(qtn.Inverse(Rotation) * Model.Rotation).eulerAngles} {Rotation}");
+        _camera.transform.localRotation = Model.HeadRotation;
+        // TODO: 変
+        Rigidbody.constraints = Model.Constraints;
 
-        // VM -> V を発動
-        Bind();
-        _rigidbody.constraints = Model.Constraints;
-        _rigidbody.AddForce(Model!.Force_leg);
+        // VM -> V
+        Rigidbody.position = Position;
+        Rigidbody.rotation = Rotation;
+        Rigidbody.velocity = Velocity;
+        Rigidbody.angularVelocity = AngularVelocity;
+    }
+
+    void ResetMousePosition()
+    {
+        vec s = new vec(Screen.width / 2, Screen.height / 2, 0);
+        Want((MousePosition - s).sqrMagnitude < 5000, MousePosition - s);
+        if ((MousePosition - s).sqrMagnitude > 5000)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            MousePosition = s;
+        }
+        else Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = false;
     }
 
     void FixedUpdate()
     {
         Assert(Model is not null);
-    }
 
-    void Adjust(float rate = 1)
-    {
-        Assert(Model is not null);
-        Want(rate is >= 0);
-
-        if (rate is > 1) throw new ArgumentOutOfRangeException();
-        if (rate is < 0) return;
-
-        // 位置合わせ
-        {
-            var delta = rate * (Model!.Position - _rigidbody.position);
-
-            _rigidbody.position += delta;
-        }
-
-        // 回転合わせ
-        {
-            var delta = rate * (Quaternion.Inverse(_rigidbody.rotation) * Model.Rotation).eulerAngles;
-
-            _rigidbody.rotation = Quaternion.Euler(delta) * _rigidbody.rotation;
-        }
-    }
-
-    void Bind()
-    {
-        //_rigidbody.position = _position;
-        //_rigidbody.rotation = _rotation;
-        //_rigidbody.velocity = _velocity;
-        //_rigidbody.angularVelocity = _anugularVelocity;
+        Rigidbody.AddForce(Rotation * Model.Force_leg);
     }
 
     void TransitBodyAnimation(object? sender, AnimationTransitionEventArgs e)
     {
-#warning 応急処置、原因究明を
-        if (_animator is null) return;
-
         Assert(_animator is not null);
 
-        e.Apply(to: _animator!);
+        e.Apply(to: _animator);
     }
 }

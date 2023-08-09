@@ -13,6 +13,7 @@ public class Player : Humanoid, IPlayer
     const float STOP_PROMPTNESS = 100f;
     const float MOVEMENT_PROMPTNESS = 20.0f;
     const float STOP_PULL_UP_COEF = 0.2f;
+    const float MOUSE_SENSITIVILITY = 0.02f;
 
     public void Move(vec direction)
     {
@@ -66,7 +67,7 @@ public class Player : Humanoid, IPlayer
         base.Elapsed(sender, e);
     }
 
-    public void Input(Action action)
+    public async void Input(Action action, float value)
     {
         switch (action)
         {
@@ -76,12 +77,15 @@ public class Player : Humanoid, IPlayer
 
                 OnTransitBodyAnimation(new(A_N_JUMP, true));
 
-                Task.Delay(JUMP_DELAY_MS).ContinueWith(_ =>
-                {
-                    Force_leg += new vec(0, 1, 0);
-                });
+                await Task.Delay(JUMP_DELAY_MS);
 
-                break;
+                Force_leg += new vec(0, 5, 0);
+
+                await Task.Delay(100);
+
+                Force_leg = new vec(0, 0, 0);
+
+                return;
             }
         case Action.Sit:
             {
@@ -107,7 +111,17 @@ public class Player : Humanoid, IPlayer
             }
         case Action.Escape:
             {
+                break;
+            }
+        case Action.VerticalRotation:
+            {
+                HeadRotation = Quaternion.Euler(MOUSE_SENSITIVILITY * value, 0, 0) * HeadRotation;
 
+                break;    
+            }
+        case Action.HorizontalRotation:
+            {
+                Rotate(euler: new(0, MOUSE_SENSITIVILITY * value, 0));
 
                 break;
             }

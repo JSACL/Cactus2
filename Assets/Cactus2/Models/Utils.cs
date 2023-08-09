@@ -4,6 +4,8 @@ using System.Runtime.CompilerServices;
 using System;
 using UED =  UnityEngine.Debug;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 public static class Utils
 {
@@ -20,7 +22,7 @@ public static class Utils
     }
 
     [Conditional("DEBUG")]
-    public static void Assert(bool condition, object? message = null, [CallerFilePath] string path = "", [CallerLineNumber] int line = -1)
+    public static void Assert([DoesNotReturnIf(false)] bool condition, object? message = null, [CallerFilePath] string path = "", [CallerLineNumber] int line = -1)
     {
         UED.Assert(condition, $"{message ?? "<Utilsに由る怎辦>"} (path: {path}, line: {line})");
     }
@@ -49,6 +51,7 @@ public static class Utils
         }
     }
 
+    // 300系みたいな形の関数。
     public static float Shinkansen300(float x) => x switch
     {
         <= 0 => 1,
@@ -65,4 +68,22 @@ public static class Utils
     };
 
     public static float Confine(float x, float min, float max) => x < min ? min : x > max ? max : x;
+
+    public static IEnumerable<T> Foreach<T>(this IEnumerable<T> @this, Action<T> callback)
+    {
+        foreach (var item in @this)
+        {
+            callback(item);
+            yield return item;
+        }
+    }
+
+    public static Quaternion Multiply(this Quaternion @this, float by)
+    {
+        var e = @this.eulerAngles;
+        if (e.x > 180) e.x -= 360;
+        if (e.y > 180) e.y -= 360;
+        if (e.z > 180) e.z -= 360;
+        return Quaternion.Euler(by * e);
+    }
 }

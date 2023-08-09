@@ -28,11 +28,12 @@ public interface IHumanoid : IAnimal
 {
     bool FootIsOn { get; set; }
     Vector3 Force_leg { get; set; }
+    Quaternion HeadRotation { get; set; }
 }
 
 public interface IPlayer : IHumanoid
 {
-    void Input(Action action);
+    void Input(Action action, float value);
 }
 
 public interface ISpecies1 : IAnimal

@@ -1,17 +1,25 @@
 using System.Collections.Generic;
+using System.Timers;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class Superintendent : MonoBehaviour
+public class ModelSystem : MonoBehaviour
 {
     [SerializeField]
+    bool _displayModel;
+
+    [SerializeField]
     GameObject _playerView;
+    [SerializeField]
+    GameObject _playerEntityView;
     [SerializeField]
     List<GameObject> _fugaEnemyViews = new();
 
     private void Start()
     {
-        _playerView.AddComponent<PlayerBehaviour>().Model = new Player();
+        var player = new Player();
+        _playerView.AddComponent<PlayerBehaviour>().Model = player;
+        _playerEntityView.AddComponent<EntityTransformViewBehaviour>().Model = player;
 
         foreach (var species1View in _fugaEnemyViews)
         {

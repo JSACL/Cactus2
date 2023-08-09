@@ -44,7 +44,8 @@ public class Entity : IEntity
 
     protected virtual void Elapsed(object? sender, ElapsedEventArgs e)
     {
-
+        Position += e.DeltaTime * Velocity;
+        Rotation = Quaternion.Euler(e.DeltaTime * AngularVelocity) * Rotation;
     }
 
     protected Vector3 GetLocalVelocity() => Quaternion.Inverse(Rotation) * Velocity;
