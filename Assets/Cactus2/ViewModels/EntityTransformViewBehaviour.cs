@@ -16,6 +16,11 @@ public class EntityTransformViewBehaviour : MonoBehaviour
         {
             Model.Position = transform.position;
             Model.Rotation = transform.rotation;
+            if (Model is Entity e) 
+            { 
+                e.Velocity = Vector3.zero; 
+                e.AngularVelocity = Vector3.zero;
+            }
         }
         else
         {

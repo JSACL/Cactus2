@@ -34,6 +34,6 @@
 //    {
 //        // áAà íuçáÇÌÇπÅB
 
-//        transform.Adjust(to: Model, rate: 1 - Exp(-ADJUSTMENT_PROMPTNESS * Time.deltaTime));
+//        transform.Adjust(to: Model, ratio: 1 - Exp(-ADJUSTMENT_PROMPTNESS * Time.deltaTime));
 //    }
 //}

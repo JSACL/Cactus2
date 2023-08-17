@@ -26,30 +26,14 @@ public static class Utils
     {
         UED.Assert(condition, $"{message ?? "<Utilsに由る怎辦>"} (path: {path}, line: {line})");
     }
+    public static void AssertIsNumber(Vector3 vector)
+    {
+        Assert(Single.IsFinite(vector.x) && !Single.IsNaN(vector.x), vector);
+        Assert(Single.IsFinite(vector.y) && !Single.IsNaN(vector.y), vector);
+        Assert(Single.IsFinite(vector.z) && !Single.IsNaN(vector.z), vector);
+    }
 
     public static Quaternion Rotated(this Quaternion @this, Vector3 by) => Quaternion.Euler(by) * @this;
-
-    public static void Adjust(this Transform @this, IEntity to, float rate = 1)
-    {
-        Want(rate is >= 0);
-
-        if (rate is > 1) throw new ArgumentOutOfRangeException();
-        if (rate is < 0) return;
-
-        // 位置合わせ
-        {
-            var delta = rate * (to.Position - @this.position);
-
-            @this.position += delta;
-        }
-
-        // 回転合わせ
-        {
-            var delta = rate * (Quaternion.Inverse(@this.rotation) * to.Rotation).eulerAngles;
-
-            @this.Rotate(delta);
-        }
-    }
 
     // 300系みたいな形の関数。
     public static float Shinkansen300(float x) => x switch
@@ -80,10 +64,9 @@ public static class Utils
 
     public static Quaternion Multiply(this Quaternion @this, float by)
     {
-        var e = @this.eulerAngles;
-        if (e.x > 180) e.x -= 360;
-        if (e.y > 180) e.y -= 360;
-        if (e.z > 180) e.z -= 360;
-        return Quaternion.Euler(by * e);
+        @this.ToAngleAxis(out var angle, out var vec);
+        if (!Single.IsNormal(vec.x) || !Single.IsNormal(vec.y) || !Single.IsNormal(vec.z)) return @this;
+        if (angle > 180) angle -= 360;
+        return Quaternion.AngleAxis(angle * by, vec);
     }
 }

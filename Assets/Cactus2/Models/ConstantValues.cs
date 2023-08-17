@@ -11,4 +11,7 @@ public static class ConstantValues
     public const string TITLE = PROJECT_N;
 
     public const string PART_N_FOOT = "Foot";
+
+    public const string N_GROUND = "Ground";
+    public const int LAYER_GROUND = 10;
 }

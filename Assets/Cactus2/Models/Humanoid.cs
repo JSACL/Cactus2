@@ -19,6 +19,7 @@ public class Humanoid : Animal, IHumanoid
     bool _footIsOn;
     vec _force_leg;
 
+    public bool IsRunning { get; set; }
     public vec Force_leg
     {
         get => _force_leg;
@@ -47,25 +48,24 @@ public class Humanoid : Animal, IHumanoid
             if (_footIsOn == value) return;
 
             _footIsOn = value;
-
-            if (_footIsOn)
-            {
-                Constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-            }
-            else
-            {
-                Constraints = RigidbodyConstraints.None;
-            }
         }
     }
     public Quaternion HeadRotation { get; set; } = Quaternion.identity;
 
-    protected override void Elapsed(object? sender, ElapsedEventArgs e)
+    protected override void Update(float deltaTime)
     {
-        base.Elapsed(sender, e);
+        if (FootIsOn)
+        {
+            Rotation.ToAngleAxis(out var angle, out var axis);
+            Rotation = Quaternion.AngleAxis(angle, vec.Dot(axis, vec.up) * vec.up);
 
-        //OnImpulse(new(Force_leg));
+            Impulse(Position, deltaTime * (Rotation * Force_leg));
+        }
+        else
+        {
+            Force_leg = vec.zero;
+        }
 
-        //OnTransitBodyAnimation(new("", false));
+        base.Update(deltaTime);
     }
 }
