@@ -4,6 +4,8 @@ using System.Runtime.CompilerServices;
 using System;
 using UED =  UnityEngine.Debug;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 public static class Utils
 {
@@ -20,32 +22,51 @@ public static class Utils
     }
 
     [Conditional("DEBUG")]
-    public static void Assert(bool condition, object? message = null, [CallerFilePath] string path = "", [CallerLineNumber] int line = -1)
+    public static void Assert([DoesNotReturnIf(false)] bool condition, object? message = null, [CallerFilePath] string path = "", [CallerLineNumber] int line = -1)
     {
         UED.Assert(condition, $"{message ?? "<Utilsに由る怎辦>"} (path: {path}, line: {line})");
+    }
+    public static void AssertIsNumber(Vector3 vector)
+    {
+        Assert(Single.IsFinite(vector.x) && !Single.IsNaN(vector.x), vector);
+        Assert(Single.IsFinite(vector.y) && !Single.IsNaN(vector.y), vector);
+        Assert(Single.IsFinite(vector.z) && !Single.IsNaN(vector.z), vector);
     }
 
     public static Quaternion Rotated(this Quaternion @this, Vector3 by) => Quaternion.Euler(by) * @this;
 
-    public static void Adjust(this Transform @this, IEntity to, float rate = 1)
+    // 300系みたいな形の関数。
+    public static float Shinkansen300(float x) => x switch
     {
-        Want(rate is >= 0);
+        <= 0 => 1,
+        <= 0.75f => 1 - (2 / 3f) * x,
+        <= 1f => 2 - 2 * x,
+        _ => 0
+    };
 
-        if (rate is > 1) throw new ArgumentOutOfRangeException();
-        if (rate is < 0) return;
+    public static float PullUp(float x) => x switch
+    {
+        <= -1 => -1,
+        >= 1 => 1,
+        _ => x
+    };
 
-        // 位置合わせ
+    public static float Confine(float x, float min, float max) => x < min ? min : x > max ? max : x;
+
+    public static IEnumerable<T> Foreach<T>(this IEnumerable<T> @this, Action<T> callback)
+    {
+        foreach (var item in @this)
         {
-            var delta = rate * (to.Position - @this.position);
-
-            @this.position += delta;
+            callback(item);
+            yield return item;
         }
+    }
 
-        // 回転合わせ
-        {
-            var delta = rate * (Quaternion.Inverse(@this.rotation) * to.Rotation).eulerAngles;
-
-            @this.Rotate(delta);
-        }
+    public static Quaternion Multiply(this Quaternion @this, float by)
+    {
+        @this.ToAngleAxis(out var angle, out var vec);
+        if (!Single.IsNormal(vec.x) || !Single.IsNormal(vec.y) || !Single.IsNormal(vec.z)) return @this;
+        if (angle > 180) angle -= 360;
+        return Quaternion.AngleAxis(angle * by, vec);
     }
 }

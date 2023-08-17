@@ -61,29 +61,29 @@ public sealed class Species1Behaviour : MonoBehaviour
         Model.Position = pos_neo;//(transform.position - _position) - (pos - Model.Position);
         Model.Rotation = rot_neo;
 
-        Adjust(rate: 1 - Exp(-ADJUSTMENT_PROMPTNESS * Time.deltaTime));
+        Adjust(ratio: 1 - Exp(-ADJUSTMENT_PROMPTNESS * Time.deltaTime));
 
         Bind();
     }
 
-    void Adjust(float rate = 1)
+    void Adjust(float ratio = 1)
     {
         Assert(Model is not null);
-        Want(rate is >= 0);
+        Want(ratio is >= 0);
 
-        if (rate is > 1) throw new ArgumentOutOfRangeException();
-        if (rate is < 0) return;
+        if (ratio is > 1) throw new ArgumentOutOfRangeException();
+        if (ratio is < 0) return;
 
         // ˆÊ’u‡‚í‚¹
         {
-            var delta = rate * (Model!.Position - _position);
+            var delta = ratio * (Model!.Position - _position);
 
             _position += delta;
         }
 
         // ‰ñ“]‡‚í‚¹
         {
-            var delta = rate * (Quaternion.Inverse(_rotation) * Model.Rotation).eulerAngles;
+            var delta = ratio * (Quaternion.Inverse(_rotation) * Model.Rotation).eulerAngles;
 
             _rotation = Quaternion.Euler(delta) * _rotation;
         }

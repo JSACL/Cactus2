@@ -10,100 +10,135 @@ using vec = UnityEngine.Vector3;
 public class Player : Humanoid, IPlayer
 {
     const int JUMP_DELAY_MS = 100;
-    const float STOP_PROMPTNESS = 0.001f;
-    const float MOVEMENT_PROMPTNESS = 1f;
+    const float STOP_PROMPTNESS = 600f;
+    const float MOVEMENT_PROMPTNESS = 180.0f;
+    const float STOP_PULL_UP_COEF = 0.2f;
 
-    public void Move(vec direction)
+    public void Seek(vec direction_local)
     {
-
+        var f = Force_leg;
+        switch (direction_local.z)
+        {
+        case < 0.001f and > -0.001f:
+            var v = vec.Dot(Velocity, Rotation * vec.forward);
+            f.z = -STOP_PROMPTNESS * PullUp(STOP_PULL_UP_COEF * v);
+            break;
+        default:
+            f += direction_local.z * MOVEMENT_PROMPTNESS * vec.forward;
+            break;
+        }
+        switch (direction_local.x)
+        {
+        case < 0.001f and > -0.001f:
+            var v = vec.Dot(Velocity, Rotation * vec.right);
+            f.x = -STOP_PROMPTNESS * PullUp(STOP_PULL_UP_COEF * v);
+            break;
+        default:
+            f += direction_local.x * MOVEMENT_PROMPTNESS * vec.right;
+            break;
+        }
+        Force_leg = f;
     }
 
-    protected override void Elapsed(object? sender, ElapsedEventArgs e)
+    public async void Jump(float strength)
     {
-        //Want(sender is PlayerBehaviour, "Elapsedが想定のゲームオブジェクト以外から送られてきてます。まぁ、大丈夫でしょうが、スレッド系のエラーに悩んだら確認してみてください。");
+        if (!FootIsOn) return;
+
+        OnTransitBodyAnimation(new(A_N_JUMP, true));
+
+        await Task.Delay(JUMP_DELAY_MS);
+        Impulse(Position, new(0, 40.0f, 0));
+    }
+
+    protected override void Update(float deltaTime)
+    {
         Want(FootIsOn, "FootIsOff");
 
         // 真偽的動作...押してる間ずっとのやつ
-        if (FootIsOn)
-        {
-            var f_stop = true;
-            if (GetKey(KeyCode.W))//GetButton(A_N_MOV_FORWARD))
-            {
-                Force_leg += e.DeltaTime * MOVEMENT_PROMPTNESS * vec.forward;
-                f_stop = false;
-            }
-            if (GetKey(KeyCode.S))//GetButton(A_N_MOV_BACKWARD))
-            {
-                Force_leg -= e.DeltaTime * MOVEMENT_PROMPTNESS * vec.back;
-                f_stop = false;
-            }
-            switch (
-                GetKey(KeyCode.A),//GetButton(A_N_MOV_LEFT), 
-                GetKey(KeyCode.D))//GetButton(A_N_MOV_RIGHT))
-            {
-            case (true, false):
-                Force_leg += e.DeltaTime * MOVEMENT_PROMPTNESS * vec.left;
-                f_stop = false;
-                break;
-            case (false, true):
-                Force_leg += e.DeltaTime * MOVEMENT_PROMPTNESS * vec.right;
-                f_stop = false;
-                break;
-            }
-            if (f_stop)
-            {
-                Force_leg *= e.DeltaTime * STOP_PROMPTNESS;
-            }
-        }
+        //if (FootIsOn)
+        //{
+        //    switch (
+        //        GetKey(KeyCode.W),
+        //        GetKey(KeyCode.S))
+        //    {
+        //    case (true, false):
+        //        break;
+        //    case (false, true):
+        //        Force_leg += deltaTime * MOVEMENT_PROMPTNESS * vec.back;
+        //        break;
+        //    case (false, false):
+        //        var f = Force_leg;
+        //        var v = vec.Dot(Velocity, Rotation * vec.forward);
+        //        f.z = deltaTime * -STOP_PROMPTNESS * PullUp(STOP_PULL_UP_COEF * v);
+        //        Force_leg = f;
+        //        break;
+        //    }
+        //    switch (
+        //        GetKey(KeyCode.A),//GetButton(A_N_MOV_LEFT), 
+        //        GetKey(KeyCode.D))//GetButton(A_N_MOV_RIGHT))
+        //    {
+        //    case (true, false):
+        //        Force_leg += deltaTime * MOVEMENT_PROMPTNESS * vec.left;
+        //        break;
+        //    case (false, true):
+        //        Force_leg += deltaTime * MOVEMENT_PROMPTNESS * vec.right;
+        //        break;
+        //    case (false, false):
+        //        var f = Force_leg;
+        //        var v = vec.Dot(Velocity, Rotation * vec.right);
+        //        f.x = deltaTime * -STOP_PROMPTNESS * PullUp(STOP_PULL_UP_COEF * v);
+        //        Force_leg = f;
+        //        break;
+        //    }
+        //}
 
-        base.Elapsed(sender, e);
+        base.Update(deltaTime);
     }
 
-    public void Input(Action action)
-    {
-        switch (action)
-        {
-        case Action.Jump:
-            {
-                if (!FootIsOn) break;
+    //protected override void Elapsed(object? sender, ElapsedEventArgs e)
+    //{
+    //    //Want(sender is PlayerBehaviour, "Elapsedが想定のゲームオブジェクト以外から送られてきてます。まぁ、大丈夫でしょうが、スレッド系のエラーに悩んだら確認してみてください。");
+    //    Want(FootIsOn, "FootIsOff");
 
-                OnTransitBodyAnimation(new(A_N_JUMP, true));
+    //    // 真偽的動作...押してる間ずっとのやつ
+    //    if (FootIsOn)
+    //    {
+    //        switch (
+    //            GetKey(KeyCode.W),
+    //            GetKey(KeyCode.S))
+    //        {
+    //        case (true, false):
+    //            Force_leg += e.DeltaTime * MOVEMENT_PROMPTNESS * vec.forward;
+    //            break;
+    //        case (false, true):
+    //            Force_leg += e.DeltaTime * MOVEMENT_PROMPTNESS * vec.back;
+    //            break;
+    //        case (false, false):
+    //            var f = Force_leg;
+    //            var v = vec.Dot(Velocity, Rotation * vec.forward);
+    //            f.z = e.DeltaTime * -STOP_PROMPTNESS * PullUp(STOP_PULL_UP_COEF * v);
+    //            Force_leg = f;
+    //            break;
+    //        }
+    //        switch (
+    //            GetKey(KeyCode.A),//GetButton(A_N_MOV_LEFT), 
+    //            GetKey(KeyCode.D))//GetButton(A_N_MOV_RIGHT))
+    //        {
+    //        case (true, false):
+    //            Force_leg += e.DeltaTime * MOVEMENT_PROMPTNESS * vec.left;
+    //            break;
+    //        case (false, true):
+    //            Force_leg += e.DeltaTime * MOVEMENT_PROMPTNESS * vec.right;
+    //            break;
+    //        case (false, false):
+    //            var f = Force_leg;
+    //            var v = vec.Dot(Velocity, Rotation * vec.right);
+    //            f.x = e.DeltaTime * -STOP_PROMPTNESS * PullUp(STOP_PULL_UP_COEF * v);
+    //            Force_leg = f;
+    //            break;
+    //        }
+    //    }
 
-                Task.Delay(JUMP_DELAY_MS).ContinueWith(_ =>
-                {
-                    Force_leg += new vec(0, 1, 0);
-                });
-
-                break;
-            }
-        case Action.Sit:
-            {
-                break;
-            }
-        case Action.Func0:
-            {
-                // アイテムを使用したり...
-
-                break;
-            }
-        case Action.Func1:
-            {
-                break;
-            }
-        case Action.Func2:
-            {
-                break;
-            }
-        case Action.Func3:
-            {
-                break;
-            }
-        case Action.Escape:
-            {
-
-
-                break;
-            }
-        }
-    }
+    //    base.Elapsed(sender, e);
+    //}
 }

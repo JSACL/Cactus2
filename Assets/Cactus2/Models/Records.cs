@@ -33,6 +33,7 @@ public readonly struct ColliderEventArgs
     public Collider Other { get; }
     public Collision? Collision { get; }
     public int CollidingCount { get; }
+    public Vector3 Impulse { get; }
 
     public ColliderEventArgs(ColliderFlug flug, Collision collision, int collidingCount)
     {
@@ -40,6 +41,7 @@ public readonly struct ColliderEventArgs
         Collision = collision;
         Other = collision.collider;
         CollidingCount = collidingCount;
+        Impulse = collision.impulse;
     }
     public ColliderEventArgs(ColliderFlug flug, Collider other, int collidingCount)
     {
@@ -47,6 +49,7 @@ public readonly struct ColliderEventArgs
         Collision = null;
         Other = other;
         CollidingCount = collidingCount;
+        Impulse = default;
     }
 }
 
@@ -98,15 +101,3 @@ public readonly struct AnimationTransitionEventArgs
 }
 
 public delegate void AnimationTransitionEventHandler(object? sender, AnimationTransitionEventArgs e);
-
-public readonly struct ImpulseEventArgs
-{
-    public Vector3 Impulse { get; }
-
-    public ImpulseEventArgs(Vector3 impulse)
-    {
-        Impulse = impulse;
-    }
-}
-
-public delegate void ImpulseEventHandler(object? sender, ImpulseEventArgs e);
