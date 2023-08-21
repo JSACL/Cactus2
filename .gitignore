@@ -74,7 +74,7 @@ StyleCopReport.xml
 *_p.c
 *_h.h
 *.ilk
-*.meta
+# *.meta # It is also used by Unity
 *.obj
 *.iobj
 *.pch
@@ -376,3 +376,6 @@ Obj
 *.userprefs
 *.swp
 *.csproj
+# (https://www.sejuku.net/blog/83605)
+*.pidb.meta
+*.pdb.meta
