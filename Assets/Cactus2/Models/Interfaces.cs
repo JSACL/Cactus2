@@ -56,7 +56,7 @@ public interface IPlayer : IHumanoid
 
         var a = HeadRotation.eulerAngles;
         if (a.x < 80 || a.x > 280 || (a.x <= 180 && vertical < 0) || (a.x >= 180 && vertical > 0))
-            HeadRotation = Quaternion.AngleAxis(DEFAULT_MOUSE_SENSITIVILITY * vertical, Vector3.right) * HeadRotation;
+            HeadRotation = Quaternion.AngleAxis(DEFAULT_MOUSE_SENSITIVILITY * vertical, Vector3.left) * HeadRotation;
         Rotate(DEFAULT_MOUSE_SENSITIVILITY * horizontal, Vector3.up);
     }
 }
