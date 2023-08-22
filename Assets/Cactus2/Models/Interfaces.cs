@@ -5,11 +5,11 @@ using UnityEngine;
 
 public interface IEntity
 {
-    Vector3 Position { get; set; }
+    Vector3 Position { get; protected set; }
     Vector3 Velocity { get; }
-    Quaternion Rotation { get; set; }
+    Quaternion Rotation { get; protected set; }
     Vector3 AngularVelocity { get; }
-    DateTime Time { get; set; }
+    DateTime Time { get; protected set; }
     float Mass { get; }
 
     void Rotate(float angle, Vector3 axis) => Rotate(Quaternion.AngleAxis(angle, axis));
@@ -22,14 +22,15 @@ public interface IEntity
 
 public interface IAnimal : IEntity
 {
-    event AnimationTransitionEventHandler? TransitBodyAnimation;
 }
 
 public interface IHumanoid : IAnimal
 {
+#warning Œö‚Ìİ’è–ğ‚È‚©‚é‚×‚µB
     bool IsRunning { get; set; }
     bool FootIsOn { get; set; }
-    Quaternion HeadRotation { get; set; }
+    Quaternion HeadRotation { get; protected set; }
+    float JumpingComponent { get; }
 
     void Turn(Vector3 to) => HeadRotation = Quaternion.Euler(to - Position);
 }
@@ -49,6 +50,12 @@ public interface IPlayer : IHumanoid
         Seek(strength * new Vector3(x, 0, z));
     }
     void Seek(Vector3 direction_local);
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="strength">
+    /// ’Z‘ÅŒ®ˆê‰ñ‚ğ’PˆÊ‚Æ‚·‚é‹­‚³B
+    /// </param>
     void Jump(float strength);
     void Turn(float horizontal, float vertical)
     {

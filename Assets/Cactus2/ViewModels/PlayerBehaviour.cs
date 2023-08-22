@@ -34,10 +34,6 @@ public class PlayerBehaviour : MonoBehaviour
     [SerializeField]
     TriggerEventSource _footTES = null!;
 
-    // rigidbodyはView用の状態を持つ(ViewModel)
-    // ただしこれはPlayerの状態というより3dモデルの状態。
-    // なので別にPlayerとしてのView用の状態=position, rotationを持ち、惰してrigidbodyのそれと一致させる(←これは必然ではない！)
-
     public IPlayer? Model
     {
         get => _model;
@@ -45,13 +41,11 @@ public class PlayerBehaviour : MonoBehaviour
         {
             if (_model is not null)
             {
-                _model.TransitBodyAnimation -= TransitBodyAnimation;
                 _model = null;
             }
             if (value is not null)
             {
                 _model = value;
-                _model.TransitBodyAnimation += TransitBodyAnimation;
             }
         }
     }
@@ -105,6 +99,7 @@ public class PlayerBehaviour : MonoBehaviour
         //Model.Input(Action.HorizontalRotation, MousePosition.x - mPos_l.x);
         //Model.Input(Action.VerticalRotation, MousePosition.y - mPos_l.y);
 
+        
     }
 
     void FixedUpdate()

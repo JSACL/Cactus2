@@ -26,6 +26,7 @@ public class Entity : IEntity
             _position = value;
         }
     }
+    vec IEntity.Position { get => Position; set => Position = value; }
     public Quaternion Rotation
     {
         get => _rotation;
@@ -34,6 +35,7 @@ public class Entity : IEntity
             _rotation = value;
         }
     }
+    Quaternion IEntity.Rotation { get => Rotation; set => Rotation = value; }
     public vec Velocity
     {
         get => _velocity;
@@ -59,7 +61,7 @@ public class Entity : IEntity
     public float Mass
     {
         get => _mass;
-        protected set
+        set
         {
             if (!Single.IsNormal(value)) throw new ArgumentException();
             _mass = value;
@@ -82,6 +84,7 @@ public class Entity : IEntity
             Update((float)dif.TotalSeconds);
         }
     }
+    DateTime IEntity.Time { get => Time; set => Time = value; }
 
     public Entity()
     {

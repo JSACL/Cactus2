@@ -3,6 +3,8 @@ using UnityEngine;
 using static Utils;
 using vec = UnityEngine.Vector3;
 using static System.MathF;
+using static ConstantValues;
+using System;
 
 public class Humanoid : Animal, IHumanoid
 {
@@ -16,10 +18,15 @@ public class Humanoid : Animal, IHumanoid
     public const float SPEED_HORIZONTAL_MAX = 1.8f;
     public const float SPEED_HORIZONTAL_MIN = -SPEED_HORIZONTAL_MAX;
 
+    bool _isRunning;
     bool _footIsOn;
     vec _force_leg;
 
-    public bool IsRunning { get; set; }
+    public bool IsRunning
+    {
+        get => _isRunning;
+        set => _isRunning = value;
+    }
     public vec Force_leg
     {
         get => _force_leg;
@@ -50,7 +57,14 @@ public class Humanoid : Animal, IHumanoid
             _footIsOn = value;
         }
     }
-    public Quaternion HeadRotation { get; set; } = Quaternion.identity;
+    public Quaternion HeadRotation { get; protected set; }
+    public float JumpingComponent { get; protected set; }
+    Quaternion IHumanoid.HeadRotation { get => HeadRotation; set => HeadRotation = value; }
+
+    public Humanoid()
+    {
+        HeadRotation = Quaternion.identity;
+    }
 
     protected override void Update(float deltaTime)
     {
@@ -65,6 +79,8 @@ public class Humanoid : Animal, IHumanoid
         {
             Force_leg = vec.zero;
         }
+
+        JumpingComponent *= Exp(-DECREASE_PROMPTNESS * deltaTime);
 
         base.Update(deltaTime);
     }

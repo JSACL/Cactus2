@@ -6,7 +6,7 @@ public class EntityTransformViewBehaviour : MonoBehaviour
     [SerializeField]
     bool _isAggressive = false;
 
-    public IEntity? Model { get; set; }
+    public Entity? Model { get; set; }
 
     private void Update()
     {
@@ -16,11 +16,8 @@ public class EntityTransformViewBehaviour : MonoBehaviour
         {
             Model.Position = transform.position;
             Model.Rotation = transform.rotation;
-            if (Model is Entity e) 
-            { 
-                e.Velocity = Vector3.zero; 
-                e.AngularVelocity = Vector3.zero;
-            }
+            Model.Velocity = Vector3.zero; 
+            Model.AngularVelocity = Vector3.zero;
         }
         else
         {

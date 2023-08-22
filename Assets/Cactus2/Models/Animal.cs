@@ -1,11 +1,18 @@
 #nullable enable
 
+using System;
+using UnityEditorInternal;
 using UnityEngine;
 using static Utils;
 
 public class Animal : Entity, IAnimal
 {
-    public event AnimationTransitionEventHandler? TransitBodyAnimation;
+    public Animal()
+    {
+    }
 
-    protected void OnTransitBodyAnimation(AnimationTransitionEventArgs e) => TransitBodyAnimation?.Invoke(this, e);
+    protected override void Update(float deltaTime)
+    {
+        base.Update(deltaTime);
+    }
 }

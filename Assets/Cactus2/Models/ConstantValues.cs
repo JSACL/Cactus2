@@ -14,4 +14,6 @@ public static class ConstantValues
 
     public const string N_GROUND = "Ground";
     public const int LAYER_GROUND = 10;
+
+    public const float DECREASE_PROMPTNESS = 1f;
 }
