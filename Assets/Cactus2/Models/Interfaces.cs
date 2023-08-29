@@ -1,9 +1,20 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-public interface IEntity
+public interface IReferee
+{
+
+}
+
+public interface IVisible
+{
+    IVisitor? Visitor { get; set; }
+}
+
+public interface IEntity : IVisible
 {
     Vector3 Position { get; set; }
     Vector3 Velocity { get; }
@@ -20,7 +31,38 @@ public interface IEntity
     void Impulse(Vector3 at, Vector3 impulse);
 }
 
-public interface IAnimal : IEntity
+public interface IFirer : IEntity
+{
+    float CooldownTimeRemaining { get; }
+    float CooldownTime { get; }
+
+    void Fire(IEntity issuer, IEntity? target);
+}
+
+public interface IBullet : IEntity
+{
+    IEntity? Issuer { get; }
+    float DamageForHitPoint { get; }
+    float DamageForRepairPoint { get; }
+    event EventHandler? ShowEffect;
+
+    void Hit();
+}
+
+public interface IEphemeral
+{
+    float Vigor { get; }
+}
+
+public interface ICharacter
+{
+    float? HitPoint { get; }
+    float? RepairPoint { get; }
+
+    void Inflict(float damageForHP, float damageForRP);
+}
+
+public interface IAnimal : IEntity, IEphemeral
 {
     event AnimationTransitionEventHandler? TransitBodyAnimation;
 }
@@ -30,6 +72,7 @@ public interface IHumanoid : IAnimal
     bool IsRunning { get; set; }
     bool FootIsOn { get; set; }
     Quaternion HeadRotation { get; set; }
+    IEntity? Focus { get; set; }
 
     void Turn(Vector3 to) => HeadRotation = Quaternion.Euler(to - Position);
 }
@@ -37,6 +80,9 @@ public interface IHumanoid : IAnimal
 public interface IPlayer : IHumanoid
 {
     internal const float DEFAULT_MOUSE_SENSITIVILITY = 1f;
+
+    int SelectedItemIndex { get; set; }
+    ReadOnlySpan<IFirer> Items { get; }
 
     void Seek(bool forward, bool backward, bool right, bool left, float strength)
     {
@@ -59,6 +105,7 @@ public interface IPlayer : IHumanoid
             HeadRotation = Quaternion.AngleAxis(DEFAULT_MOUSE_SENSITIVILITY * vertical, Vector3.left) * HeadRotation;
         Rotate(DEFAULT_MOUSE_SENSITIVILITY * horizontal, Vector3.up);
     }
+    void Fire(float timeSpan);
 }
 
 public interface ISpecies1 : IAnimal

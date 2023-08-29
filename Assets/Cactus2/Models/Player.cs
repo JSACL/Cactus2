@@ -14,6 +14,35 @@ public class Player : Humanoid, IPlayer
     const float MOVEMENT_PROMPTNESS = 180.0f;
     const float STOP_PULL_UP_COEF = 0.2f;
 
+    int _itemNumber;
+    int _itemCount = 3;
+    IFirer[] _items;
+
+    public override IVisitor? Visitor
+    {
+        get => base.Visitor;
+        set
+        {
+            _visitor?.Remove(this);
+            _visitor = value;
+            _visitor?.Add(this);
+        }
+    }
+    public int SelectedItemIndex
+    {
+        get => _itemNumber;
+        set
+        {
+            _itemNumber = value % _itemCount;
+        }
+    }
+    public ReadOnlySpan<IFirer> Items => _items;
+
+    public Player(params IFirer[] items)
+    {
+        _items = items;
+    }
+
     public void Seek(vec direction_local)
     {
         var f = Force_leg;
@@ -48,6 +77,11 @@ public class Player : Humanoid, IPlayer
 
         await Task.Delay(JUMP_DELAY_MS);
         Impulse(Position, new(0, 40.0f, 0));
+    }
+
+    public void Fire(float timeSpan)
+    {
+        _items[_itemNumber].Fire(this, Focus);
     }
 
     protected override void Update(float deltaTime)
@@ -93,6 +127,13 @@ public class Player : Humanoid, IPlayer
         //}
 
         base.Update(deltaTime);
+
+        foreach (var item in _items) 
+        { 
+            item.Position = Position;
+            item.Rotation = Rotation * HeadRotation;
+        }
+        //Items[SelectedItemIndex].Rotation = Rotation;
     }
 
     //protected override void Elapsed(object? sender, ElapsedEventArgs e)

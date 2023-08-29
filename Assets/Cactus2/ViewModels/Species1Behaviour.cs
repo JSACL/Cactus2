@@ -9,18 +9,24 @@ using static ConstantValues;
 using static UnityEngine.Input;
 using static Utils;
 using vec = UnityEngine.Vector3;
+using qtn = UnityEngine.Quaternion;
+using System.Reflection;
 
-public sealed class Species1Behaviour : MonoBehaviour
+public class Species1Behaviour : MonoBehaviour
 {
-    const float ADJUSTMENT_PROMPTNESS = 0.001f;
+    const float ADJUSTMENT_PROMPTNESS = 3f;
 
     ISpecies1? _model;
-    vec _position = vec.zero;
-    Quaternion _rotation = Quaternion.identity;
-    vec _velocity = vec.zero;
-    vec _anugularVelocity = vec.zero;
-    Rigidbody _rigidbody = null!;
-    Animator _animator = null!;
+    [Header("Internal")]
+    [SerializeField]
+    int _groundCount_onFoot;
+    [Header("External")]
+    [SerializeField]
+    readonly Rigidbody _rigidbody = null!;
+    [SerializeField]
+    CollisionEventSource _bodyCES = null!;
+    [SerializeField]
+    TriggerEventSource _footTES = null!;
 
     public ISpecies1? Model
     {
@@ -29,76 +35,75 @@ public sealed class Species1Behaviour : MonoBehaviour
         {
             if (_model is not null)
             {
-                _model.TransitBodyAnimation -= TransitBodyAnimation;
                 _model = null;
             }
             if (value is not null)
             {
                 _model = value;
-                _model.TransitBodyAnimation += TransitBodyAnimation;
             }
         }
     }
+    protected Rigidbody Rigidbody => _rigidbody;
+    private protected vec Position
+    //{ get; set; }
+    { get => _rigidbody.position; set => _rigidbody.position = value; }
+    private protected qtn Rotation
+    //{ get; set; }
+    { get => _rigidbody.rotation; set => _rigidbody.rotation = value; }
 
     void Start()
     {
-        //var tSs = GetComponentsInChildren<TriggerSensor>();
-        //var sls = GetComponentsInChildren<Slider>();
+        _footTES.Enter += (_, e) => { if (e.Other.gameObject.layer is LAYER_GROUND) _groundCount_onFoot++; };
+        _footTES.Exit += (_, e) => { if (e.Other.gameObject.layer is LAYER_GROUND) _groundCount_onFoot--; };
+        _bodyCES.Stay += (_, e) => { Model?.Impulse(Model.Position, e.Impulse); };
 
-        //_footSensor = (from tS in tSs where tS.Name is PART_N_FOOT select tS).Single();
-        //_slider = (from sl in sls where sl.name is "sample" select sl).Single();
-        _rigidbody = GetComponentInChildren<Rigidbody>();
-        _animator = GetComponentInChildren<Animator>();
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     private void Update()
     {
         Assert(Model is not null);
 
-        var pos_neo = Model!.Position + (transform.position - _position);
-        var rot_neo = (Quaternion.Inverse(_rotation) * transform.rotation) * Model.Rotation;
-        Model.Time += TimeSpan.FromSeconds(Time.deltaTime);
-        Model.Position = pos_neo;//(transform.position - _position) - (pos - Model.Position);
-        Model.Rotation = rot_neo;
+        // V -> VM
+        // VM -> M ...?
+        Model.AddTime(Time.deltaTime);
+        Model.Impulse(Model.Position, Time.deltaTime * Model.Mass * Physics.gravity);
 
-        Adjust(ratio: 1 - Exp(-ADJUSTMENT_PROMPTNESS * Time.deltaTime));
 
-        Bind();
     }
 
-    void Adjust(float ratio = 1)
+    void FixedUpdate()
     {
         Assert(Model is not null);
-        Want(ratio is >= 0);
 
-        if (ratio is > 1) throw new ArgumentOutOfRangeException();
-        if (ratio is < 0) return;
+        // M -> VM
+        //Rigidbody.AddForce(10f * (Model.Position - Position));
+        //Rigidbody.AddTorque(10f * (qtn.Inverse(Rotation) * Model.Rotation).eulerAngles);
+        var ratio = 1 - Exp(-ADJUSTMENT_PROMPTNESS * Time.deltaTime);
+        // transform‚ðmodel‚Ö“K‚©‚·B
+        //Position += ratio * (Model.Position - Position);
+        Position = vec.Lerp(Position, Model.Position, ratio);
+        //Debug.Log($"{Model.Position - Position} {Model.Position} {Position}");
+        //Rotation = (qtn.Inverse(Rotation) * Model.Rotation).Multiply(by: 1) * Rotation;
+        Rotation = qtn.Lerp(Rotation, Model.Rotation, ratio);
 
-        // ˆÊ’u‡‚í‚¹
-        {
-            var delta = ratio * (Model!.Position - _position);
+        Rigidbody.velocity = Model.Velocity;
+        Rigidbody.angularVelocity = Model.AngularVelocity;
+        ////Debug.Log($"{(qtn.Inverse(Rotation) * Model.Rotation).eulerAngles} {Rotation}");
+        Rigidbody.mass = Model.Mass;
 
-            _position += delta;
-        }
-
-        // ‰ñ“]‡‚í‚¹
-        {
-            var delta = ratio * (Quaternion.Inverse(_rotation) * Model.Rotation).eulerAngles;
-
-            _rotation = Quaternion.Euler(delta) * _rotation;
-        }
+        //// VM -> V
+        //Rigidbody.position = Position;
+        //Rigidbody.rotation = Rotation;
+        //Rigidbody.velocity = Velocity;
+        //Rigidbody.angularVelocity = AngularVelocity;
     }
 
-    void Bind()
+    public static Species1Behaviour Instantiate(string? name = null, Transform? transform = null)
     {
-        _rigidbody.position = _position;
-        _rigidbody.rotation = _rotation;
-        _rigidbody.velocity = _velocity;
-        _rigidbody.angularVelocity = _anugularVelocity;
-    }
-
-    void TransitBodyAnimation(object? sender, AnimationTransitionEventArgs e)
-    {
-        e.Apply(to: _animator);
+        name ??= MethodBase.GetCurrentMethod().DeclaringType.ToString();
+        var obj = new GameObject(name);
+        var r = obj.AddComponent<Species1Behaviour>();
+        return r;
     }
 }

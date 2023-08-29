@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using System.ComponentModel;
 using UnityEngine;
 
 public readonly struct ElapsedEventArgs
@@ -101,3 +102,17 @@ public readonly struct AnimationTransitionEventArgs
 }
 
 public delegate void AnimationTransitionEventHandler(object? sender, AnimationTransitionEventArgs e);
+
+public readonly struct CollectionChangeEventArgs
+{
+    public CollectionChangeAction Action { get; }
+    public object? Element { get; }
+
+    public CollectionChangeEventArgs(CollectionChangeAction action, object? element)
+    {
+        Action = action;
+        Element = element;
+    }
+}
+
+public delegate void CollectionChangeEventHandler(object? sender, CollectionChangeEventArgs e);

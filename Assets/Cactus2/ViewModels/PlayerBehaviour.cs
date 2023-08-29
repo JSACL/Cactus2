@@ -12,7 +12,7 @@ using vec = UnityEngine.Vector3;
 using qtn = UnityEngine.Quaternion;
 
 // View-Model
-public class PlayerBehaviour : MonoBehaviour
+public class PlayerBehaviour : MonoBehaviour, IViewModel<IPlayer>
 {
     const float ADJUSTMENT_PROMPTNESS = 3f;
 
@@ -53,6 +53,7 @@ public class PlayerBehaviour : MonoBehaviour
                 _model = value;
                 _model.TransitBodyAnimation += TransitBodyAnimation;
             }
+            enabled = _model is { };
         }
     }
     protected Rigidbody Rigidbody => _rigidbody;
@@ -67,12 +68,6 @@ public class PlayerBehaviour : MonoBehaviour
 
     void Start()
     {
-        _rigidbody = GetComponentInChildren<Rigidbody>();
-        _animator = GetComponentInChildren<Animator>();
-        _camera = GetComponentInChildren<Camera>();
-        _footTES = GetComponentsInChildren<TriggerEventSource>().First();
-        _bodyCES = GetComponentsInChildren<CollisionEventSource>().First();
-
         _footTES.Enter += (_, e) => { if (e.Other.gameObject.layer is LAYER_GROUND) _groundCount_onFoot++; };
         _footTES.Exit += (_, e) => { if (e.Other.gameObject.layer is LAYER_GROUND) _groundCount_onFoot--; };
         _bodyCES.Stay += (_, e) => { Model?.Impulse(Model.Position, e.Impulse); };
@@ -94,6 +89,7 @@ public class PlayerBehaviour : MonoBehaviour
         if (GetKeyDown(KeyCode.Space)) Model.Jump(1);
         Model.AddTime(Time.deltaTime);
         Model.Impulse(Model.Position, Time.deltaTime * Model.Mass * Physics.gravity);
+        if (GetMouseButtonDown(0)) Model.Fire(Time.deltaTime);
         //var pos_neo = Model.Position + (Position - pos_l); // 1: êÊÇ…åvéZ
         //var rot_neo = (qtn.Inverse(rot_l) * Rotation) * Model.Rotation; // 1:
         //Model.Position += Position - pos_l; // 2: ëäéËÇçló∂ÇµÇƒåvéZ
