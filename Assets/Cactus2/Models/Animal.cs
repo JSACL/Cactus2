@@ -1,13 +1,15 @@
 #nullable enable
 
+using System;
 using System.Threading.Tasks;
 using static Utils;
+using static System.Math;
 
 public class Animal : Entity, IAnimal
 {
     float _recoveryProhDR = 0; // prohibition duration rest
-    float _vigor;
-    float _repairPoint;
+    float _vitality;
+    float _resilience;
 
     public override IVisitor? Visitor 
     { 
@@ -20,10 +22,10 @@ public class Animal : Entity, IAnimal
         } 
     }
     public float RepairPromptness { get; } = 0.2f;
-    public float RepairPointRecoveryDelay { get; } = 1;
+    public float ResilienceRecoveryDelay { get; } = 1;
     public float RepairA { get; } = 0.1f;
-    public float Vigor { get => _vigor; set => _vigor = Confine(value, 0, 1); }
-    public float RepairPoint { get => _repairPoint; set => _repairPoint = Confine(value, 0, 1); }
+    public float Vitality { get => _vitality; set => _vitality = Clamp(value, 0, 1); }
+    public float Resilience { get => _resilience; set => _resilience = Clamp(value, 0, 1); }
 
     public event AnimationTransitionEventHandler? TransitBodyAnimation;
 
@@ -31,10 +33,19 @@ public class Animal : Entity, IAnimal
 
     protected override void Update(float deltaTime)
     {
-        if (_repairPoint == 0) _recoveryProhDR = RepairPointRecoveryDelay;
+        if (_resilience == 0) _recoveryProhDR = ResilienceRecoveryDelay;
         if (_recoveryProhDR <= 0)
-            RepairPoint += deltaTime * RepairPromptness * (1 - Vigor + RepairA);
+            Resilience += deltaTime * RepairPromptness * (1 - Vitality + RepairA);
 
         base.Update(deltaTime);
+    }
+
+    public void InflictOnVitality(float strength)
+    {
+        Vitality -= strength;
+    }
+    public void InflictOnResilience(float damage)
+    {
+        Resilience -= damage;
     }
 }

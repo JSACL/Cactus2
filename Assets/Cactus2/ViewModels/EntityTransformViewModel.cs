@@ -1,12 +1,10 @@
 using UnityEngine;
 using static Utils;
 
-public class EntityTransformViewBehaviour : MonoBehaviour
+public class EntityTransformViewModel : ViewModel<IEntity>
 {
     [SerializeField]
     bool _isAggressive = false;
-
-    public IEntity? Model { get; set; }
 
     private void Update()
     {

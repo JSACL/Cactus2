@@ -6,7 +6,7 @@ using UnityEngine;
 
 public interface IReferee
 {
-
+    public void AddTeam(Team team);
 }
 
 public interface IVisible
@@ -31,35 +31,49 @@ public interface IEntity : IVisible
     void Impulse(Vector3 at, Vector3 impulse);
 }
 
-public interface IFirer : IEntity
+public interface IItem
+{
+    void Use(object? user);
+}
+
+public interface IWeapon : IEntity, IItem
 {
     float CooldownTimeRemaining { get; }
     float CooldownTime { get; }
 
-    void Fire(IEntity issuer, IEntity? target);
+    void Trigger(Team? team);
+    void Trigger(ParticipantInfo participantInfo);
+
+    void IItem.Use(object? user) => Trigger(Referee.GetInfo(of: user));
+}
+
+public interface IFirer : IWeapon
+{
 }
 
 public interface IBullet : IEntity
 {
-    IEntity? Issuer { get; }
-    float DamageForHitPoint { get; }
-    float DamageForRepairPoint { get; }
+    float DamageForVitality { get; }
+    float DamageForResilience { get; }
+
     event EventHandler? ShowEffect;
 
     void Hit();
 }
 
-public interface IEphemeral
+public interface IHoming : IEntity
 {
-    float Vigor { get; }
+    Vector3? TargetCoordinate { get; set; }
 }
 
-public interface ICharacter
+public interface IEphemeral
 {
-    float? HitPoint { get; }
-    float? RepairPoint { get; }
+    float Vitality { get; }
+    float Resilience { get; }
 
-    void Inflict(float damageForHP, float damageForRP);
+    void InflictOnVitality(float damage);
+    void InflictOnResilience(float damage);
+    
 }
 
 public interface IAnimal : IEntity, IEphemeral
@@ -75,15 +89,6 @@ public interface IHumanoid : IAnimal
     IEntity? Focus { get; set; }
 
     void Turn(Vector3 to) => HeadRotation = Quaternion.Euler(to - Position);
-}
-
-public interface IPlayer : IHumanoid
-{
-    internal const float DEFAULT_MOUSE_SENSITIVILITY = 1f;
-
-    int SelectedItemIndex { get; set; }
-    ReadOnlySpan<IFirer> Items { get; }
-
     void Seek(bool forward, bool backward, bool right, bool left, float strength)
     {
         var x = 0f;
@@ -98,13 +103,23 @@ public interface IPlayer : IHumanoid
     void Jump(float strength);
     void Turn(float horizontal, float vertical)
     {
-        //HeadRotation = Quaternion.AngleAxis(DEFAULT_MOUSE_SENSITIVILITY * horizontal, Vector3.up) * Quaternion.AngleAxis(DEFAULT_MOUSE_SENSITIVILITY * vertical, HeadRotation * Vector3.right) * HeadRotation;
-
         var a = HeadRotation.eulerAngles;
         if (a.x < 80 || a.x > 280 || (a.x <= 180 && vertical < 0) || (a.x >= 180 && vertical > 0))
-            HeadRotation = Quaternion.AngleAxis(DEFAULT_MOUSE_SENSITIVILITY * vertical, Vector3.left) * HeadRotation;
-        Rotate(DEFAULT_MOUSE_SENSITIVILITY * horizontal, Vector3.up);
+            HeadRotation = Quaternion.AngleAxis(vertical, Vector3.left) * HeadRotation;
+        Rotate(horizontal, Vector3.up);
     }
+}
+
+public interface IGround
+{
+
+}
+
+public interface IPlayer : IHumanoid
+{
+    int SelectedItemIndex { get; set; }
+    IReadOnlyList<IItem> Items { get; }
+
     void Fire(float timeSpan);
 }
 

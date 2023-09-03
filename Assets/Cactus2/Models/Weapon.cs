@@ -1,8 +1,8 @@
 #nullable enable
-using System;
-using UnityEngine;
+using static Unity.VisualScripting.Antlr3.Runtime.Tree.TreeWizard;
+using UnityEngine.UIElements;
 
-public class Firer1 : Entity, IFirer
+public abstract class Weapon : Entity, IWeapon
 {
     float _cooldownTimeRemaining;
 
@@ -17,7 +17,8 @@ public class Firer1 : Entity, IFirer
         }
     }
     public float CooldownTimeRemaining => _cooldownTimeRemaining;
-    public float CooldownTime => 1f;
+    public virtual float CooldownTime => 1f;
+    public virtual float InitialSpeed => 5f;
 
     protected override void Update(float deltaTime)
     {
@@ -27,20 +28,23 @@ public class Firer1 : Entity, IFirer
         base.Update(deltaTime);
     }
 
-    public void Fire(IEntity issuer, IEntity? target)
+    public void Trigger(Team? team)
     {
         if (CooldownTimeRemaining > 0) return;
 
         _cooldownTimeRemaining = CooldownTime;
 
-        var v = target is null ? Rotation * Vector3.forward : target.Position - Position;
-        new Bullet(issuer) 
-        { 
-            Target = target, 
-            Rotation = Quaternion.LookRotation(v), 
-            Position = Position,
-            Velocity = v.normalized,
-            Visitor = Visitor 
-        };
+        Fire(team);
     }
+    public void Trigger(ParticipantInfo participantInfo)
+    {
+        if (CooldownTimeRemaining > 0) return;
+
+        _cooldownTimeRemaining = CooldownTime;
+
+        Fire(participantInfo);
+    }
+
+    protected abstract void Fire(Team? team);
+    protected abstract void Fire(ParticipantInfo participantInfo);
 }

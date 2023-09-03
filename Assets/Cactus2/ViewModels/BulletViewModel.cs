@@ -6,10 +6,8 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using static Utils;
 
-public class BulletBehaviour : MonoBehaviour, IViewModel<IBullet>
+public class BulletViewModel : ViewModel<IBullet>
 {
-    IBullet? _model;
-
     [SerializeField]
     bool _adsorbOnApproaching;
     [SerializeField]
@@ -33,35 +31,30 @@ public class BulletBehaviour : MonoBehaviour, IViewModel<IBullet>
     [HideInInspector]//AttachTarget‚ªOn‚ÌŽžA–Ú•W‚É‚­‚Á‚Â‚¢‚Ä‚¢‚é‚©‚Ç‚¤‚©‚ðŽ¦‚·B
     public bool Attached;
 
-    public IBullet? Model
+    protected override void Connect()
     {
-        get => _model;
-        set
-        {
-            if (_model is { })
-            {
-                _model.ShowEffect -= ShowEffect;
-                _model = null;
-            }
-            if (value is { })
-            {
-                _model = value;
-                _model.ShowEffect += ShowEffect;
-            }
-            enabled = _model is { };
-        }
+        base.Connect();
+        Model.ShowEffect += ShowEffect;
+    }
+    protected override void Disconnect()
+    {
+        Model.ShowEffect -= ShowEffect;
+        base.Disconnect();
     }
 
     void Start()
     {
         _bodyTES.Enter += (_, e) =>
         {
-            Assert(Model is not null);
-
-            if (e.Other.GetComponent<InflictionEventSource>() is { } iES)
+            if (e.Other.GetComponentSC<TargetComponent>() is { } tC)
             {
-                iES.Inflict(Model.Issuer, Model.DamageForHitPoint, Model.DamageForRepairPoint);
-                Model.Hit();
+                var pI = Referee.GetInfo(Model);
+                if (pI.IsTargeting(tC.ParticipantInfo))
+                {
+                    tC.InflictToHitPoint(pI, Model.DamageForVitality);
+                    tC.InflictToRepairPoint(pI, Model.DamageForResilience);
+                    Model.Hit();
+                }
             }
         };
     }
@@ -69,6 +62,11 @@ public class BulletBehaviour : MonoBehaviour, IViewModel<IBullet>
     void OnEnable()
     {
         _isAdsorbed = false;
+        _hitEffect.SetActive(false);
+
+        transform.position = Model.Position;
+        transform.rotation = Model.Rotation;
+
         //if (_speaker != null)
         //{
         //    _speaker.transform.position = transform.position;

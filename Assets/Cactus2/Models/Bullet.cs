@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Threading.Tasks;
 using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
 
@@ -15,48 +16,40 @@ public class Bullet : Entity, IBullet
             _visitor?.Add(this);
         }
     }
-    public float DamageForVagor { get; }
-    float IBullet.DamageForHitPoint => DamageForVagor;
-    public float DamageForRepairPoint { get; }
+    public float DamageForVitality { get; }
+    public float DamageForResilience { get; }
     public bool VanishOnHit { get; }
     public bool VanishAutonomously { get; }
     public bool BreakOnlyOnDefaultLayer { get; }
-    public IEntity? Target { get; set; }
-    public IEntity Issuer { get; }
+    public Vector3? TargetCoordinate { get; set; }
     public event EventHandler? ShowEffect;
 
-    public Bullet(IEntity issuer)
+    public Bullet()
     {
-        Issuer = issuer;
     }
 
-    public void Hit()
+    public async void Hit()
     {
         ShowEffect?.Invoke(this, EventArgs.Empty);
         //Visitor = null;
+
+        await Task.Delay(100);
+        Visitor = null;
     }
 
     protected override void Update(float deltaTime)
     {
-        Debug.Log($"{Velocity} {Position}");
-
         base.Update(deltaTime);
+
+        Track(deltaTime);
     }
 
     protected void Track(float deltaTime)
     {
-        if (Target != null)
+        if (TargetCoordinate is Vector3 tC)
         {
-            Rotation = Quaternion.Lerp(Rotation, Quaternion.LookRotation(Target.Position - Position), deltaTime);
+            Rotation = Quaternion.Lerp(Rotation, Quaternion.LookRotation(tC - Position), deltaTime);
+            Velocity += Rotation * Vector3.forward;
         }
-        //velocity += acceleration * Time.deltaTime;
-        //if (acceleration != 0f)
-        //{
-        //    this.gameObject.transform.position += this.gameObject.transform.forward * (((velocity * velocity) - (velocity_ini * velocity_ini)) / (2f * acceleration));
-        //}
-        //else
-        //{
-        //    this.gameObject.transform.position += this.gameObject.transform.forward * (velocity * Time.deltaTime);
-        //}
     }
 }

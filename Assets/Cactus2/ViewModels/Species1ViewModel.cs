@@ -12,11 +12,10 @@ using vec = UnityEngine.Vector3;
 using qtn = UnityEngine.Quaternion;
 using System.Reflection;
 
-public class Species1Behaviour : MonoBehaviour
+public class Species1ViewModel : ViewModel<ISpecies1>
 {
     const float ADJUSTMENT_PROMPTNESS = 3f;
 
-    ISpecies1? _model;
     [Header("Internal")]
     [SerializeField]
     int _groundCount_onFoot;
@@ -28,21 +27,6 @@ public class Species1Behaviour : MonoBehaviour
     [SerializeField]
     TriggerEventSource _footTES = null!;
 
-    public ISpecies1? Model
-    {
-        get => _model;
-        set
-        {
-            if (_model is not null)
-            {
-                _model = null;
-            }
-            if (value is not null)
-            {
-                _model = value;
-            }
-        }
-    }
     protected Rigidbody Rigidbody => _rigidbody;
     private protected vec Position
     //{ get; set; }
@@ -97,13 +81,5 @@ public class Species1Behaviour : MonoBehaviour
         //Rigidbody.rotation = Rotation;
         //Rigidbody.velocity = Velocity;
         //Rigidbody.angularVelocity = AngularVelocity;
-    }
-
-    public static Species1Behaviour Instantiate(string? name = null, Transform? transform = null)
-    {
-        name ??= MethodBase.GetCurrentMethod().DeclaringType.ToString();
-        var obj = new GameObject(name);
-        var r = obj.AddComponent<Species1Behaviour>();
-        return r;
     }
 }

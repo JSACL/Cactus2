@@ -15,3 +15,11 @@ public enum ColliderFlug : sbyte
     Enter = 1,
     Exit = -1,
 }
+
+public enum Judgement
+{
+    None = 0,
+    Invalid = -1,
+    Valid = 1,
+    Error = -4,
+}

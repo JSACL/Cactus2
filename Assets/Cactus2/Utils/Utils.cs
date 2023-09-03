@@ -6,6 +6,7 @@ using UED =  UnityEngine.Debug;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using static UnityEngine.ParticleSystem;
 
 public static class Utils
 {
@@ -51,8 +52,6 @@ public static class Utils
         _ => x
     };
 
-    public static float Confine(float x, float min, float max) => x < min ? min : x > max ? max : x;
-
     public static IEnumerable<T> Foreach<T>(this IEnumerable<T> @this, Action<T> callback)
     {
         foreach (var item in @this)
@@ -68,5 +67,18 @@ public static class Utils
         if (!Single.IsNormal(vec.x) || !Single.IsNormal(vec.y) || !Single.IsNormal(vec.z)) return @this;
         if (angle > 180) angle -= 360;
         return Quaternion.AngleAxis(angle * by, vec);
+    }
+
+    public static T? GetComponentIC<T>(this Component @this, string name, bool includeInactive = false) where T : Component => GetComponentIC<T>(@this.transform, name, includeInactive);
+    public static T? GetComponentIC<T>(this GameObject @this, string name, bool includeInactive = false) where T : Component => GetComponentIC<T>(@this.transform, name, includeInactive);
+    public static T? GetComponentIC<T>(this Transform @this, string name, bool includeInactive = false) where T : Component
+    {
+        if (@this.name == name && @this.TryGetComponent<T>(out var r)) return r;
+        var l = @this.childCount;
+        for (int i = 0; i < l; i++)
+        {
+            if (@this.GetChild(i).GetComponentIC<T>(name, includeInactive) is { } r_) return r_;
+        }
+        return null;
     }
 }
