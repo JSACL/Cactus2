@@ -61,6 +61,16 @@ public interface IBullet : IEntity
     void Hit();
 }
 
+public interface ILaser : IEntity
+{
+    float DamageForVitality { get; }
+    float DamageForResilience { get; }
+
+    event EventHandler? ShowEffect;
+
+    void Hit();
+}
+
 public interface IHoming : IEntity
 {
     Vector3? TargetCoordinate { get; set; }

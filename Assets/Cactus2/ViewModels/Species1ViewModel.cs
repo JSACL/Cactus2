@@ -21,7 +21,7 @@ public class Species1ViewModel : ViewModel<ISpecies1>
     int _groundCount_onFoot;
     [Header("External")]
     [SerializeField]
-    readonly Rigidbody _rigidbody = null!;
+    Rigidbody _rigidbody = null!;
     [SerializeField]
     CollisionEventSource _bodyCES = null!;
     [SerializeField]
@@ -51,9 +51,6 @@ public class Species1ViewModel : ViewModel<ISpecies1>
         // V -> VM
         // VM -> M ...?
         Model.AddTime(Time.deltaTime);
-        Model.Impulse(Model.Position, Time.deltaTime * Model.Mass * Physics.gravity);
-
-
     }
 
     void FixedUpdate()
