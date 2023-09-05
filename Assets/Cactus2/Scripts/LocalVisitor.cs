@@ -10,6 +10,7 @@ using SF = UnityEngine.SerializeField;
 using DBS = System.Diagnostics.DebuggerBrowsableState;
 using GOS = IObjectSource<UnityEngine.GameObject>;
 using Unity.VisualScripting;
+using System.Collections;
 
 public class LocalVisitor : MonoBehaviour, IVisitor
 {
@@ -25,28 +26,21 @@ public class LocalVisitor : MonoBehaviour, IVisitor
     public GameObject entityView;
     public GameObject species1View;
 
-    GOS _playerViewSource;
-    GOS _combatUIViewSource;
-    GOS _firerViewSource;
-    GOS _bulletViewSource;
-    GOS _laserViewSource;
-    GOS _entityViewSource;
-    GOS _species1ViewSource;
-
-    [DB(DBS.Never)]
-    readonly Dictionary<object, ViewModel[]> _vMs = new();
-
-    public IEnumerable<object> Models => _vMs.Keys;
+    readonly ArrayViewModels<IPlayer> _players = new();
+    readonly SingleViewModels<IEntity> _firers = new();
+    readonly SingleViewModels<IBullet> _bullets = new();
+    readonly SingleViewModels<ILaser> _lasers = new();
+    readonly SingleViewModels<IEntity> _entities = new();
+    readonly SingleViewModels<ISpecies1> _species1s = new();
 
     private void Awake()
     {
-        _playerViewSource = new GameObjectSource(playerView);
-        _combatUIViewSource = new GameObjectSource(combatUIView);
-        _firerViewSource = new GameObjectSource(firerView);
-        _bulletViewSource = new GameObjectPool(bulletView);
-        _laserViewSource = new GameObjectPool(laserView);
-        _entityViewSource = new GameObjectPool(entityView);
-        _species1ViewSource = new GameObjectPool(species1View);
+        _players.GameObjectSources = new GOS[] { new GameObjectSource(playerView), new GameObjectSource(combatUIView) };
+        _firers.GameObjectSource = new GameObjectSource(firerView);
+        _bullets.GameObjectSource = new GameObjectSource(bulletView);
+        _lasers.GameObjectSource = new GameObjectSource(laserView);
+        _entities.GameObjectSource = new GameObjectSource(entityView);
+        _species1s.GameObjectSource = new GameObjectSource(species1View);
     }
 
     void Start()
@@ -59,102 +53,114 @@ public class LocalVisitor : MonoBehaviour, IVisitor
         var s = new FugaEnemy() { Visitor = this, Velocity = Vector3.forward, Position = new Vector3(0, 10, 0) };
     }
 
-    public void AddStatic(object model, params ViewModel[] with)
+    public void Add(IPlayer model) => _players.Add(model);
+    public void Remove(IPlayer model) => _players.Remove(model);
+
+    public void Add(IEntity model) => _entities.Add(model);
+    public void Remove(IEntity model) => _entities.Remove(model);
+
+    public void Add(IBullet model) => _bullets.Add(model);
+    public void Remove(IBullet model) => _bullets.Remove(model);
+
+    public void Add(ILaser model) => _lasers.Add(model);
+    public void Remove(ILaser model) => _lasers.Remove(model);
+
+    public void Add(IFirer model) => _firers.Add(model);
+    public void Remove(IFirer model) => _firers.Remove(model);
+
+    public void Add(ISpecies1 model) => _species1s.Add(model);
+    public void Remove(ISpecies1 model) => _species1s.Remove(model);
+}
+
+public class SingleViewModels<TModel> : ICollection<TModel> where TModel : class
+{
+    GOS? _objectSource;
+    readonly Dictionary<TModel, ViewModel<TModel>> _vMs;
+
+    public GOS? GameObjectSource
     {
-        _vMs.Add(model, with);
+        get => _objectSource;
+        set => _objectSource = value;
     }
 
-    public void Add(IPlayer model)
+    public SingleViewModels()
     {
-        if (_vMs.ContainsKey(model)) return;
-        var pVM = _playerViewSource.Get().GetComponent<ViewModel>();
-        var cUIVM = _combatUIViewSource.Get().GetComponent<ViewModel>();
-        pVM.Model = model;
-        cUIVM.Model = model;
-        _vMs.Add(model, new ViewModel[] { pVM, cUIVM });
-    }
-    public void Remove(IPlayer model)
-    {
-        var vMs = _vMs[model];
-        _playerViewSource.Release(vMs[0].gameObject);
-        _combatUIViewSource.Release(vMs[1].gameObject);
-        vMs[0].Model = null;
-        vMs[1].Model = null;
-        _vMs.Remove(model);
+        _vMs = new();
     }
 
-    public void Add(IEntity model)
+    public int Count => _vMs.Count;
+    public bool IsReadOnly => false;
+    public void Add(TModel item)
     {
-        if (_vMs.ContainsKey(model)) return;
-        var eVM = _entityViewSource.Get().GetComponent<ViewModel>();
-        eVM.Model = model;
-        _vMs.Add(model, new ViewModel[] { eVM });
+        if (!_vMs.TryGetValue(item, out var vM))
+        {
+            if (_objectSource is null) throw new InvalidOperationException();
+            vM = _objectSource.Get().GetComponent<ViewModel<TModel>>();
+            _vMs.Add(item, vM);
+        }
+        vM.Model = item;
     }
-    public void Remove(IEntity model)
+    public void Clear() => throw new NotImplementedException();
+    public bool Contains(TModel item) => throw new NotImplementedException();
+    public void CopyTo(TModel[] array, int arrayIndex) => throw new NotImplementedException();
+    public IEnumerator<TModel> GetEnumerator() => _vMs.Keys.GetEnumerator();
+    public bool Remove(TModel item)
     {
-        var vMs = _vMs[model];
-        _entityViewSource.Release(vMs[0].gameObject);
-        vMs[0].Model = null;
-        _vMs.Remove(model);
+        if (_vMs.TryGetValue(item, out var vM))
+        {
+            if (_objectSource is null) throw new InvalidOperationException();
+            _objectSource.Release(vM.gameObject);
+            vM.Model = null;
+            _ = _vMs.Remove(item);
+            return true;
+        }
+        return false;
+    }
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+}
+
+public class ArrayViewModels<TModel> : ICollection<TModel> where TModel : class
+{
+    GOS[] _objectSources;
+    readonly Dictionary<TModel, ViewModel<TModel>[]> _vMs;
+
+    public GOS[] GameObjectSources
+    {
+        get => _objectSources;
+        set => _objectSources = value;
     }
 
-    public void Add(IBullet model)
+    public ArrayViewModels()
     {
-        if (_vMs.ContainsKey(model)) return;
-        var eVM = _bulletViewSource.Get().GetComponent<ViewModel>();
-        eVM.Model = model;
-        _vMs.Add(model, new ViewModel[] { eVM });
-    }
-    public void Remove(IBullet model)
-    {
-        var vMs = _vMs[model];
-        _bulletViewSource.Release(vMs[0].gameObject);
-        vMs[0].Model = null;
-        _vMs.Remove(model);
+        _objectSources = Array.Empty<GOS>();
+        _vMs = new();
     }
 
-    public void Add(ILaser model)
+    public int Count => _vMs.Count;
+    public bool IsReadOnly => false;
+    public void Add(TModel item)
     {
-        if (_vMs.ContainsKey(model)) return;
-        var eVM = _laserViewSource.Get().GetComponent<ViewModel>();
-        eVM.Model = model;
-        _vMs.Add(model, new ViewModel[] { eVM });
+        if (!_vMs.TryGetValue(item, out var vMs))
+        {
+            vMs = _objectSources.Select(x => x.Get().GetComponent<ViewModel<TModel>>()).ToArray();
+            _vMs.Add(item, vMs);
+        }
+        foreach (var vM in vMs) vM.Model = item;
     }
-    public void Remove(ILaser model)
+    public void Clear() => throw new NotImplementedException();
+    public bool Contains(TModel item) => throw new NotImplementedException();
+    public void CopyTo(TModel[] array, int arrayIndex) => throw new NotImplementedException();
+    public IEnumerator<TModel> GetEnumerator() => _vMs.Keys.GetEnumerator();
+    public bool Remove(TModel item)
     {
-        var vMs = _vMs[model];
-        _laserViewSource.Release(vMs[0].gameObject);
-        vMs[0].Model = null;
-        _vMs.Remove(model);
+        if (_vMs.TryGetValue(item, out var vMs))
+        {
+            for (int i = 0; i < vMs.Length; i++) _objectSources[i].Release(vMs[i].gameObject);
+            foreach (var vM in vMs) vM.Model = null;
+            _ = _vMs.Remove(item);
+            return true;
+        }
+        return false;
     }
-
-    public void Add(IFirer model)
-    {
-        if (_vMs.ContainsKey(model)) return;
-        var eVM = _firerViewSource.Get().GetComponent<ViewModel>();
-        eVM.Model = model;
-        _vMs.Add(model, new ViewModel[] { eVM });
-    }
-    public void Remove(IFirer model)
-    {
-        var vMs = _vMs[model];
-        _firerViewSource.Release(vMs[0].gameObject);
-        vMs[0].Model = null;
-        _vMs.Remove(model);
-    }
-
-    public void Add(ISpecies1 model)
-    {
-        if (_vMs.ContainsKey(model)) return;
-        var eVM = _species1ViewSource.Get().GetComponent<ViewModel>();
-        eVM.Model = model;
-        _vMs.Add(model, new ViewModel[] { eVM });
-    }
-    public void Remove(ISpecies1 model)
-    {
-        var vMs = _vMs[model];
-        _species1ViewSource.Release(vMs[0].gameObject);
-        vMs[0].Model = null;
-        _vMs.Remove(model);
-    }
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
