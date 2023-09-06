@@ -69,6 +69,14 @@ public static class Utils
         return Quaternion.AngleAxis(angle * by, vec);
     }
 
+    public static IEnumerable<TResult> Successed<TSource, TResult>(this IEnumerable<TSource> @this, TryFunc<TSource, TResult> tryFunc)
+    {
+        foreach (var item in @this)
+        {
+            if (tryFunc(item, out var r)) yield return r;
+        }
+    }
+
     public static T? GetComponentIC<T>(this Component @this, string name, bool includeInactive = false) where T : Component => GetComponentIC<T>(@this.transform, name, includeInactive);
     public static T? GetComponentIC<T>(this GameObject @this, string name, bool includeInactive = false) where T : Component => GetComponentIC<T>(@this.transform, name, includeInactive);
     public static T? GetComponentIC<T>(this Transform @this, string name, bool includeInactive = false) where T : Component

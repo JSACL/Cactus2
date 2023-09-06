@@ -23,9 +23,11 @@ public class Bullet : Entity, IBullet
     public bool BreakOnlyOnDefaultLayer { get; }
     public Vector3? TargetCoordinate { get; set; }
     public event EventHandler? ShowEffect;
+    //public Tag Tag { get; }
 
-    public Bullet()
+    public Bullet(Tag? tag)
     {
+        Tag = tag ?? Tag.Unknown;
     }
 
     public async void Hit()

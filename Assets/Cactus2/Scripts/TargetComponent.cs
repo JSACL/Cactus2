@@ -4,19 +4,30 @@ using UnityEngine;
 
 public class TargetComponent : SCComponent
 {
-    public ParticipantInfo ParticipantInfo { get; set; }
+    public Tag Tag { get; set; } = Tag.Unknown;
     public float HitPoint { get; set; }
     public float RepairPoint { get; set; }
-    public event EventHandler<(ParticipantInfo issuer, float point)>? HitPointInflicted;
-    public event EventHandler<(ParticipantInfo issuer, float point)>? RepairPointInflicted;
+    public event EventHandler<float>? HitPointInflicted;
+    public event EventHandler<float>? RepairPointInflicted;
 
-    public void InflictToHitPoint(ParticipantInfo issuer, float point)
+    public void InflictToHitPoint(float point)
     {
-        HitPointInflicted?.Invoke(this, (issuer, point));
+        HitPointInflicted?.Invoke(this, point);
     }
 
-    public void InflictToRepairPoint(ParticipantInfo issuer, float point)
+    public void InflictToRepairPoint(float point)
     {
-        RepairPointInflicted?.Invoke(this, (issuer, point));
+        RepairPointInflicted?.Invoke(this, point);
+    }
+
+    [Obsolete("判定は攻撃側が行ったほうがいいと思うのダ。受ける方は為手何人に関わらず甘んじて受けなさい。")]
+    public void InflictToHitPoint(Tag issuer, float point)
+    {
+        HitPointInflicted?.Invoke(this, point);
+    }
+    [Obsolete("判定は攻撃側が行ったほうがいいと思うのダ。受ける方は為手何人に関わらず甘んじて受けなさい。")]
+    public void InflictToRepairPoint(Tag issuer, float point)
+    {
+        RepairPointInflicted?.Invoke(this, point);
     }
 }

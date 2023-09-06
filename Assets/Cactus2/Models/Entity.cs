@@ -93,6 +93,7 @@ public class Entity : IEntity
             Update((float)dif.TotalSeconds);
         }
     }
+    public Tag Tag { get; set; } = Tag.Unknown;
 
     public Entity()
     {
@@ -121,4 +122,10 @@ public class Entity : IEntity
     }
 
     protected Vector3 GetLocalVelocity() => Quaternion.Inverse(Rotation) * Velocity;
+
+    public bool TrySetTag(Tag tag)
+    {
+        Tag = tag;
+        return true;
+    }
 }

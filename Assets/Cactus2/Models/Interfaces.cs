@@ -2,11 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public interface IReferee
 {
-    public void AddTeam(Team team);
+    Judgement Judge(Tag offensiveSide, Tag defensiveSide);
+    Task<Judgement> JudgeAsync(Tag offensiveSide, Tag defensiveSide) => Task.FromResult(Judge(offensiveSide, defensiveSide));
+
+    static IReferee Current { get; set; } = SuperiourReferee.Topmost;
 }
 
 public interface IVisible
@@ -22,6 +26,7 @@ public interface IEntity : IVisible
     Vector3 AngularVelocity { get; }
     DateTime Time { get; set; }
     float Mass { get; }
+    Tag Tag => Tag.Unknown;
 
     void Rotate(float angle, Vector3 axis) => Rotate(Quaternion.AngleAxis(angle, axis));
     [Obsolete]
@@ -29,11 +34,13 @@ public interface IEntity : IVisible
     void Rotate(Quaternion rotation) => Rotation = rotation * Rotation;
     void AddTime(float deltaTime) => Time += TimeSpan.FromSeconds(deltaTime);
     void Impulse(Vector3 at, Vector3 impulse);
+    // TODO; ŠÃ‚¦‚È‚«‚à‚·‚éBˆá”½‚Å‚Í‚È‚¢‚ªB
+    bool TrySetTag(Tag tag) => false;
 }
 
 public interface IItem
 {
-    void Use(object? user);
+    //void Use(object? user);
 }
 
 public interface IWeapon : IEntity, IItem
@@ -41,10 +48,9 @@ public interface IWeapon : IEntity, IItem
     float CooldownTimeRemaining { get; }
     float CooldownTime { get; }
 
-    void Trigger(Team? team);
-    void Trigger(ParticipantInfo participantInfo);
+    void Trigger();
 
-    void IItem.Use(object? user) => Trigger(Referee.GetInfo(of: user));
+    //void IItem.Use(object? user) => Trigger(Referee.GetInfo(of: user));
 }
 
 public interface IFirer : IWeapon

@@ -34,11 +34,11 @@ public class LaserViewModel : ViewModel<ILaser>
         {
             if (e.Other.GetComponentSC<TargetComponent>() is { } tC)
             {
-                var pI = Referee.GetInfo(Model);
-                if (pI.IsTargeting(tC.ParticipantInfo))
+                var j = IReferee.Current.Judge(Model.Tag, tC.Tag);
+                if (j == Judgement.Valid)
                 {
-                    tC.InflictToHitPoint(pI, Model.DamageForVitality);
-                    tC.InflictToRepairPoint(pI, Model.DamageForResilience);
+                    tC.InflictToHitPoint(Model.DamageForVitality);
+                    tC.InflictToRepairPoint(Model.DamageForResilience);
                     Model.Hit();
                 }
             }

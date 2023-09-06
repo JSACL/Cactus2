@@ -44,7 +44,10 @@ public class Player : Humanoid, IPlayer
 
     public void Fire(float timeSpan)
     {
-        _items[_itemNumber].Use(this);
+        if (_items is IWeapon weapon)
+        {
+            weapon.Trigger();
+        }
     }
 
     protected override void Update(float deltaTime)

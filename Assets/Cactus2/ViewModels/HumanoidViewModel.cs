@@ -39,7 +39,7 @@ public class HumanoidViewModel : ViewModel<IHumanoid>
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
-        _bodyIES.ParticipantInfo = Referee.GetInfo(Model);
+        _bodyIES.Tag = Model.Tag;
 
         _footTES.Enter += (_, e) =>
         {
@@ -53,31 +53,22 @@ public class HumanoidViewModel : ViewModel<IHumanoid>
         };
         _bodyCES.Stay += (_, e) =>
         {
-            Assert(Model is not null);
-
             Model.Impulse(Model.Position, e.Impulse);
         };
         _bodyIES.HitPointInflicted += async (_, e) =>
         {
-            Assert(Model is not null);
-
-            var j = await Referee.Judge(e.issuer, Referee.GetInfo(Model));
-            if (j is Judgement.Valid) Model.InflictOnVitality(e.point);
+            Model.InflictOnVitality(e);
         };
     }
 
     private void Update()
     {
-        Assert(Model is not null);
-
         Model.FootIsOn = _groundComponents.Count > 0;
         Model.AddTime(Time.deltaTime);
     }
 
     void FixedUpdate()
     {
-        Assert(Model is not null);
-
         var ratio = 1 - Exp(-ADJUSTMENT_PROMPTNESS * Time.deltaTime);
         _rigidbody.position = vec.Lerp(_rigidbody.position, Model.Position, ratio);
         _rigidbody.rotation = qtn.Lerp(_rigidbody.rotation, Model.Rotation, ratio);
@@ -90,8 +81,6 @@ public class HumanoidViewModel : ViewModel<IHumanoid>
 
     void TransitBodyAnimation(object? sender, AnimationTransitionEventArgs e)
     {
-        Assert(_animator is not null);
-
         e.Apply(to: _animator);
     }
 }

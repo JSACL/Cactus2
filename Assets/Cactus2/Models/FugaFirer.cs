@@ -4,28 +4,19 @@ using UnityEngine;
 
 public class FugaFirer : Weapon, IFirer
 {
-    protected override void Fire(Team? team)
+    public FugaFirer(TeamGameReferee.Team team) : base(team)
     {
-        var b = new Bullet()
-        {
-            Rotation = Rotation, 
-            Position = Position,
-            Velocity = Rotation * (InitialSpeed * Vector3.forward),
-            Visitor = Visitor 
-        };
-        
-        team?.Referee.Join(b, team.Name);
+
     }
-    protected override void Fire(ParticipantInfo participantInfo)
+
+    protected override void Fire(Tag tag)
     {
-        var b = new Bullet()
+        var b = new Bullet(tag)
         {
             Rotation = Rotation,
             Position = Position,
             Velocity = Rotation * (InitialSpeed * Vector3.forward),
             Visitor = Visitor
         };
-
-        Referee.SetInfo(b, participantInfo);
     }
 }

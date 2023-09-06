@@ -43,16 +43,6 @@ public class LocalVisitor : MonoBehaviour, IVisitor
         _species1s.GameObjectSource = new GameObjectSource(species1View);
     }
 
-    void Start()
-    {
-        var p = new Player() { Visitor = this };
-        Referee.SetInfo(p, new(10));
-        p.Items.Add(new FugaFirer() { Visitor = this });
-        p.Items.Add(new FugaFirer() { Visitor = this });
-        p.Items.Add(new FugaFirer() { Visitor = this });
-        var s = new FugaEnemy() { Visitor = this, Velocity = Vector3.forward, Position = new Vector3(0, 10, 0) };
-    }
-
     public void Add(IPlayer model) => _players.Add(model);
     public void Remove(IPlayer model) => _players.Remove(model);
 
@@ -122,6 +112,12 @@ public class SingleViewModels<TModel> : ICollection<TModel> where TModel : class
 public class ArrayViewModels<TModel> : ICollection<TModel> where TModel : class
 {
     GOS[] _objectSources;
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <remarks>
+    /// 各値には、その所属する対象の異同に関わらず、ViewModelが並びますが、同一のGameObjectに所属するViewModelは隣接することが保証されます。
+    /// </remarks>
     readonly Dictionary<TModel, ViewModel<TModel>[]> _vMs;
 
     public GOS[] GameObjectSources
@@ -142,7 +138,8 @@ public class ArrayViewModels<TModel> : ICollection<TModel> where TModel : class
     {
         if (!_vMs.TryGetValue(item, out var vMs))
         {
-            vMs = _objectSources.Select(x => x.Get().GetComponent<ViewModel<TModel>>()).ToArray();
+            // 同一の対象に属するViewModelは隣接することに基づく異同判定。
+            vMs = _objectSources.SelectMany(x => x.Get().GetComponents<ViewModel<TModel>>()).ToArray();
             _vMs.Add(item, vMs);
         }
         foreach (var vM in vMs) vM.Model = item;
@@ -155,8 +152,13 @@ public class ArrayViewModels<TModel> : ICollection<TModel> where TModel : class
     {
         if (_vMs.TryGetValue(item, out var vMs))
         {
-            for (int i = 0; i < vMs.Length; i++) _objectSources[i].Release(vMs[i].gameObject);
+            var last = default(GameObject);
             foreach (var vM in vMs) vM.Model = null;
+            for (int i = 0; i < vMs.Length; i++) 
+            { 
+                if (last != vMs[i].gameObject) _objectSources[i].Release(vMs[i].gameObject);
+                last = vMs[i].gameObject;
+            }
             _ = _vMs.Remove(item);
             return true;
         }

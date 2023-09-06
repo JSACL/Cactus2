@@ -5,42 +5,23 @@ using System.Linq;
 using System.Threading.Tasks;
 using TMPro.EditorUtilities;
 
-public class Referee
+public class SuperiourReferee : IReferee
 {
-    public Referee()
+    readonly List<IReferee> _inferiors;
+
+    public IEnumerable<IReferee> Inferiors => _inferiors;
+
+    public SuperiourReferee()
     {
+        _inferiors = new();
     }
 
-    public Judgement JudgeC(ParticipantInfo offensiveSide, ParticipantInfo defensiveSide)
-    {
-        var t_o = offensiveSide.Team;
-        if (t_o is null) return Judgement.Valid;
-
-        return t_o.IsEnemy(with: defensiveSide.Team) ? Judgement.Valid : Judgement.Invalid;
-    }
-
-    public void Join(object obj, object @in)
-    {
-        SetInfo(obj, GetInfo(of: @in));
-    }
-    public void Join(object obj, string teamName)
-    {
-        var team = _participants.Values.FirstOrDefault(x => x.Team is { } team && team.Name == teamName).Team;
-        team ??= new Team(this, teamName);
-        Join(obj, team);
-    }
-
-    static readonly List<Referee> _referees = new() { new() };
-    static readonly Dictionary<object?, ParticipantInfo> _participants = new();
-
-    public static Referee Current { get; } = new Referee();
-
-    public static Task<Judgement> Judge(ParticipantInfo offensiveSide, ParticipantInfo defensiveSide)
+    public Judgement Judge(Tag offensiveSide, Tag defensiveSide)
     {
         var j = Judgement.None;
-        foreach (var referee in _referees)
+        foreach (var referee in _inferiors)
         {
-            var j_ = referee.JudgeC(offensiveSide, defensiveSide);
+            var j_ = referee.Judge(offensiveSide, defensiveSide);
             j = (j, j_) switch
             {
                 (Judgement.Error, _) => Judgement.Error,
@@ -50,90 +31,128 @@ public class Referee
                 _ => Judgement.None,
             };
         }
-        return Task.FromResult(j);
+        return j;
+    }
+    public async Task<Judgement> JudgeAsync(Tag offensiveSide, Tag defensiveSide)
+    {
+        var j = Judgement.None;
+        var js = await Task.WhenAll(_inferiors.Select(x => x.JudgeAsync(offensiveSide, defensiveSide)));
+        foreach (var j_ in js)
+        {
+            j = (j, j_) switch
+            {
+                (Judgement.Error, _) => Judgement.Error,
+                (not Judgement.Invalid, Judgement.Valid) => Judgement.Valid,
+                (not Judgement.Valid, Judgement.Invalid) => Judgement.Invalid,
+                (_, Judgement.Error) => Judgement.Error,
+                _ => Judgement.None,
+            };
+        }
+        return j;
     }
 
-    public static void SetInfo(object of, ParticipantInfo participantInfo)
+    public void Add(IReferee referee)
     {
-        if (participantInfo == ParticipantInfo.Unknown)
+        _inferiors.Add(referee);
+    }
+
+    public void Remove(IReferee referee)
+    {
+        _inferiors.Remove(referee);
+    }
+
+    public static SuperiourReferee Topmost { get; } = new();
+}
+
+public class TeamGameReferee : IReferee 
+{
+    readonly Tag.Dictionary<Team> _teams;
+
+    public TeamGameReferee()
+    {
+        _teams = new();
+    }
+
+    public Judgement Judge(Tag offensiveSide, Tag defensiveSide)
+    {
+        var t_o = _teams[offensiveSide];
+        var t_d = _teams[defensiveSide];
+
+        if (t_o is null) return Judgement.None;
+
+        return (t_o.IsEnemy(with: t_d), t_o.IsFriend(with: t_d)) switch
         {
-            _ = _participants.Remove(of);
+            (true, false) => Judgement.Valid,
+            (false, true) => Judgement.Invalid,
+            (false, false) => Judgement.None,
+            (true, true) => Judgement.Error,
+        };
+    }
+
+    public class Team
+    {
+        readonly TeamGameReferee _referee;
+        readonly Dictionary<Team?, TeamRelationShip> _relationships;
+        string _name;
+        Tag? _member;
+        Tag? _weapon;
+
+        public Tag? Member
+        {
+            get => _member;
+            set => SetPI(ref _member, value);
         }
-        else
+        public Tag? Weapon
         {
-            if (!_participants.TryAdd(of, participantInfo))
+            get => _weapon;
+            set => SetPI(ref _weapon, value);
+        }
+
+        public TeamGameReferee Referee
+        {
+            get => _referee;
+        }
+        public string Name
+        {
+            get => _name;
+            set => _name = value ?? String.Empty;
+        }
+
+        public Team(TeamGameReferee referee, string name = "")
+        {
+            _referee = referee;
+            _relationships = new();
+            _name = name;
+        }
+
+        public void Regard(Team other, TeamRelationShip @as)
+        {
+            if (!_referee.Equals(other._referee)) throw new ArgumentException("チームの監督が異なります。", nameof(other));
+
+            _relationships.Add(other, @as);
+        }
+        public void Disregard(Team other)
+        {
+            if (!_referee.Equals(other._referee)) throw new ArgumentException("チームの監督が異なります。", nameof(other));
+
+            _relationships.Remove(other);
+        }
+
+        public bool IsEnemy(Team? with) => _relationships.TryGetValue(with, out var r) && r == TeamRelationShip.Enemy;
+        public bool IsFriend(Team? with) => _relationships.TryGetValue(with, out var r) && r == TeamRelationShip.Friend;
+
+        void SetPI(ref Tag? field, Tag? value)
+        {
+            if (field is { })
             {
-                _participants[of] = participantInfo;
+                _referee._teams[field] = default;
+                field = null;
+            }
+            if (value is { })
+            {
+                field = value;
+                _referee._teams[field] = this;
             }
         }
     }
-
-    public static ParticipantInfo GetInfo(object? of)
-    {
-        return of is not null && _participants.TryGetValue(of, out var r) ? r : ParticipantInfo.Unknown;
-    }
-}
-
-public readonly struct ParticipantInfo : IEquatable<ParticipantInfo>
-{
-    readonly int _identifier;
-
-    public Team? Team => _teams.Length > _identifier ? _teams[_identifier] : null;
-
-    public ParticipantInfo(int identifier)
-    {
-        _identifier = identifier;
-    }
-
-    public bool IsTargeting(ParticipantInfo other)
-    {
-        return other._identifier != _identifier;
-    }
-
-    public override bool Equals(object? obj) => obj is ParticipantInfo info && Equals(info);
-    public bool Equals(ParticipantInfo other) => _identifier == other._identifier;
-    public override int GetHashCode() => HashCode.Combine(_identifier);
-
-    static readonly Team?[] _teams;
-
-    static ParticipantInfo()
-    {
-        _teams = Array.Empty<Team>();
-    }
-
-    public static ParticipantInfo Unknown => default;
-    public static ParticipantInfo NaturalStructure => new(-1);
-
-    public static bool operator ==(ParticipantInfo left, ParticipantInfo right) => left.Equals(right);
-    public static bool operator !=(ParticipantInfo left, ParticipantInfo right) => !(left == right);
-}
-
-public class Team
-{
-    readonly Referee _referee;
-    readonly List<Team?> _enemies;
-    readonly List<Team?> _friends;
-    string _name;
-
-    public Referee Referee
-    {
-        get => _referee;
-    }
-    public string Name
-    {
-        get => _name;
-        set => _name = value ?? String.Empty;
-    }
-
-    public Team(Referee referee, string name = "")
-    {
-        _referee = referee;
-        _name = name;
-        _enemies = new();
-        _friends = new() { this };
-    }
-
-    public bool IsEnemy(Team? with) => _enemies.Contains(with);
-
-    public bool IsFriend(Team? with) => _friends.Contains(with);
 }

@@ -51,7 +51,7 @@ public class LocalPlayerViewModel : ViewModel<IPlayer>
         //_bodyCES = this.GetComponentIC<CollisionEventSource>("body")!;
         //_footTES = this.GetComponentIC<TriggerEventSource>("foot")!;
         //_bodyTC = this.GetComponentIC<TargetComponent>("body")!;
-        _bodyTC.ParticipantInfo = Referee.GetInfo(Model);
+        _bodyTC.Tag = Model.Tag;
 
         _footTES.Enter += (_, e) => 
         {
@@ -67,15 +67,13 @@ public class LocalPlayerViewModel : ViewModel<IPlayer>
         {
             Model.Impulse(Model.Position, e.Impulse); 
         };
-        _bodyTC.HitPointInflicted += async (_, e) =>
+        _bodyTC.HitPointInflicted += (_, e) =>
         {
-            var j = await Referee.Judge(e.issuer, Referee.GetInfo(Model));
-            if (j is Judgement.Valid) Model.InflictOnVitality(e.point);
+            Model.InflictOnVitality(e);
         };
-        _bodyTC.RepairPointInflicted += async (_, e) =>
+        _bodyTC.RepairPointInflicted += (_, e) =>
         {
-            var j = await Referee.Judge(e.issuer, Referee.GetInfo(Model));
-            if (j is Judgement.Valid) Model.InflictOnResilience(e.point);
+            Model.InflictOnResilience(e);
         };
     }
 
