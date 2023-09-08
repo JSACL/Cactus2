@@ -66,11 +66,11 @@ public class SuperiourReferee : IReferee
 
 public class TeamGameReferee : IReferee 
 {
-    readonly Tag.Dictionary<Team> _teams;
+    readonly CorrespondenceDictionary<Tag, Team> _teams;
 
     public TeamGameReferee()
     {
-        _teams = new();
+        _teams = new(Tag.Context);
     }
 
     public Judgement Judge(Tag offensiveSide, Tag defensiveSide)
@@ -145,13 +145,13 @@ public class TeamGameReferee : IReferee
         {
             if (field is { })
             {
-                _referee._teams[field] = default;
+                _referee._teams.Remove(field);
                 field = null;
             }
             if (value is { })
             {
                 field = value;
-                _referee._teams[field] = this;
+                _referee._teams.Add(field, this);
             }
         }
     }
