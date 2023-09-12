@@ -9,10 +9,12 @@ using Unity.VisualScripting;
 /// <summary>
 /// 軄は各実体の役割を一意に表します。
 /// </summary>
-public class Tag : Context<Tag>.Index
+public class Tag : Context.Index
 {
     readonly string _name;
     readonly CorrespondenceDictionary<Tag, Relationship> _relationships;
+
+    public string Name => _name;
 
     /// <summary>
     /// 軄を名に拠って作します。
@@ -29,13 +31,13 @@ public class Tag : Context<Tag>.Index
         return _relationships[to];
     }
 
+    public static new Context<Tag> Context { get; } = new();
+
     public static Tag GetOrCreate(string name)
     {
-        foreach (var tag in Context.Indexes) if (tag._name == name) return tag;
-        return new(name);
+        foreach (var tag in Context.Indexes) if (tag.Name == name) return tag;
+        return new Tag(name);
     }
-
-    public new static Context<Tag> Context { get; } = new();
 
     public static Tag Unknown { get; } = new("Unknown");
     public static Tag NaturalStructure => new("Natural");

@@ -6,6 +6,7 @@ using static ConstantValues;
 using static System.MathF;
 using static System.Math;
 using System.Threading.Tasks;
+using System;
 
 public class Humanoid : Animal, IHumanoid
 {
@@ -69,6 +70,11 @@ public class Humanoid : Animal, IHumanoid
     }
     public Quaternion HeadRotation { get; set; } = Quaternion.identity;
     public IEntity? Focus { get; set; }
+
+    public Humanoid(DateTime time) : base(time)
+    {
+
+    }
 
     public void Seek(vec direction_local)
     {

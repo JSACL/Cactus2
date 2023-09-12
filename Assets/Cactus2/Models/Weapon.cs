@@ -22,7 +22,7 @@ public abstract class Weapon : Entity, IWeapon
     public virtual float InitialSpeed => 5f;
     public TeamGameReferee.Team Team { get; set; }
 
-    public Weapon(TeamGameReferee.Team team)
+    public Weapon(DateTime time, TeamGameReferee.Team team) : base(time)
     {
         Team = team;
     }

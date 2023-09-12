@@ -95,8 +95,10 @@ public class Entity : IEntity
     }
     public Tag Tag { get; set; } = Tag.Unknown;
 
-    public Entity()
+    public Entity(DateTime time)
     {
+        _time = time;
+
         Mass = 10;
         Rotation = Quaternion.identity;
     }

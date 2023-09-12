@@ -33,5 +33,5 @@ public class GameObjectSource : IObjectSource<GameObject>
     }
 
     public GameObject Get() => UE::Object.Instantiate(Prefab);
-    public void Release(GameObject obj) => UE::Object.Destroy(Prefab);
+    public void Release(GameObject obj) => UE::Object.Destroy(obj);
 }

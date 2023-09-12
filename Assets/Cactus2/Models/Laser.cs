@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
 
-public class Laser : Entity, IBullet
+public class Laser : Entity, ILaser
 {
     public override IVisitor? Visitor
     {
@@ -18,13 +18,11 @@ public class Laser : Entity, IBullet
     }
     public float DamageForVitality { get; }
     public float DamageForResilience { get; }
-    public bool VanishOnHit { get; }
-    public bool VanishAutonomously { get; }
-    public bool BreakOnlyOnDefaultLayer { get; }
-    public Vector3? TargetCoordinate { get; set; }
+    public float Length { set;  get; }
+    public float Strength { private set; get; } = 200;
     public event EventHandler? ShowEffect;
 
-    public Laser()
+    public Laser(DateTime time) : base(time)
     {
     }
 
@@ -40,5 +38,8 @@ public class Laser : Entity, IBullet
     protected override void Update(float deltaTime)
     {
         base.Update(deltaTime);
+
+        Strength -= 10 * deltaTime;
+        if (Strength <= 0) Visitor = null;
     }
 }

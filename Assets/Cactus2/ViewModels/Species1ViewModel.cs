@@ -42,6 +42,8 @@ public class Species1ViewModel : ViewModel<ISpecies1>
         _bodyCES.Stay += (_, e) => { Model?.Impulse(Model.Position, e.Impulse); };
 
         Cursor.lockState = CursorLockMode.Locked;
+
+        Model.TargetCoordinates = new Vector3[] { new vec(40, 0, 0) };
     }
 
     private void Update()

@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using static System.Math;
 
-public class CorrespondenceDictionary<TKey, TValue> : IDictionary<TKey, TValue> where TKey : Context<TKey>.Index where TValue : notnull
+public class CorrespondenceDictionary<TKey, TValue> : IDictionary<TKey, TValue> where TKey : Context.Index where TValue : notnull
 {
     readonly Context<TKey> _context;
     TValue?[] _arr;
@@ -18,7 +18,7 @@ public class CorrespondenceDictionary<TKey, TValue> : IDictionary<TKey, TValue> 
         {
             lock (_arr)
             {
-                Array.Resize(ref _arr, Min(_arr.Length, value));
+                Array.Resize(ref _arr, Max(_arr.Length, value));
             }
         }
     }
@@ -42,7 +42,7 @@ public class CorrespondenceDictionary<TKey, TValue> : IDictionary<TKey, TValue> 
 
     void Extend(int to)
     {
-        Capacity = Min(to, _arr.Length * 2);
+        Capacity = Max(to + 1, _arr.Length * 2);
     }
 
     public void Add(TKey key, TValue value)

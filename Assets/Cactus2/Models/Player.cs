@@ -37,7 +37,7 @@ public class Player : Humanoid, IPlayer
     public IList<IItem> Items => _items;
     IReadOnlyList<IItem> IPlayer.Items => _items;
 
-    public Player()
+    public Player(DateTime time) : base(time)
     {
         _items = new();
     }

@@ -29,6 +29,11 @@ public class Animal : Entity, IAnimal
 
     public event AnimationTransitionEventHandler? TransitBodyAnimation;
 
+    public Animal(DateTime time) : base(time)
+    {
+
+    }
+
     protected void OnTransitBodyAnimation(AnimationTransitionEventArgs e) => TransitBodyAnimation?.Invoke(this, e);
 
     protected override void Update(float deltaTime)
@@ -40,11 +45,11 @@ public class Animal : Entity, IAnimal
         base.Update(deltaTime);
     }
 
-    public void InflictOnVitality(float strength)
+    public virtual void InflictOnVitality(float strength)
     {
         Vitality -= strength;
     }
-    public void InflictOnResilience(float damage)
+    public virtual void InflictOnResilience(float damage)
     {
         Resilience -= damage;
     }

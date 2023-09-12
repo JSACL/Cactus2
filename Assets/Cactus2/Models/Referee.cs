@@ -75,10 +75,8 @@ public class TeamGameReferee : IReferee
 
     public Judgement Judge(Tag offensiveSide, Tag defensiveSide)
     {
-        var t_o = _teams[offensiveSide];
-        var t_d = _teams[defensiveSide];
-
-        if (t_o is null) return Judgement.None;
+        if (!_teams.TryGetValue(offensiveSide, out var t_o)) return Judgement.None;
+        if (!_teams.TryGetValue(defensiveSide, out var t_d)) return Judgement.None;
 
         return (t_o.IsEnemy(with: t_d), t_o.IsFriend(with: t_d)) switch
         {

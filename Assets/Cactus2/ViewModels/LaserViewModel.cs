@@ -4,10 +4,15 @@ using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.UIElements;
 using static Utils;
 
 public class LaserViewModel : ViewModel<ILaser>
 {
+    [SerializeField]
+    Transform _headT;
+    [SerializeField]
+    Transform _colliderT;
     [SerializeField]
     AudioClip _breakingSE;
     [SerializeField]
@@ -49,9 +54,6 @@ public class LaserViewModel : ViewModel<ILaser>
     {
         _hitEffect.SetActive(false);
 
-        transform.position = Model.Position;
-        transform.rotation = Model.Rotation;
-
         //if (_speaker != null)
         //{
         //    _speaker.transform.position = transform.position;
@@ -64,8 +66,10 @@ public class LaserViewModel : ViewModel<ILaser>
 
         Model.AddTime(Time.deltaTime);
 
-        transform.position = Model.Position;
-        transform.rotation = Model.Rotation;
+        _headT.SetPositionAndRotation(Model.Position, Model.Rotation);
+        var mid = Model.Position - 0.5f * Model.Length * (Model.Rotation * Vector3.forward);
+        _colliderT.SetPositionAndRotation(mid, Model.Rotation);
+        _colliderT.localScale = new(1, 1, Model.Length);
     }
 
     void ShowEffect(object? sender, EventArgs e)

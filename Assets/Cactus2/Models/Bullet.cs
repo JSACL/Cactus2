@@ -25,9 +25,9 @@ public class Bullet : Entity, IBullet
     public event EventHandler? ShowEffect;
     //public Tag Tag { get; }
 
-    public Bullet(Tag? tag)
+    public Bullet(DateTime time) : base(time)
     {
-        Tag = tag ?? Tag.Unknown;
+        Tag = Tag.Unknown;
     }
 
     public async void Hit()

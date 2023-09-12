@@ -37,8 +37,8 @@ public class LocalVisitor : MonoBehaviour, IVisitor
     {
         _players.GameObjectSources = new GOS[] { new GameObjectSource(playerView), new GameObjectSource(combatUIView) };
         _firers.GameObjectSource = new GameObjectSource(firerView);
-        _bullets.GameObjectSource = new GameObjectSource(bulletView);
-        _lasers.GameObjectSource = new GameObjectSource(laserView);
+        _bullets.GameObjectSource = new GameObjectPool(bulletView);
+        _lasers.GameObjectSource = new GameObjectPool(laserView);
         _entities.GameObjectSource = new GameObjectSource(entityView);
         _species1s.GameObjectSource = new GameObjectSource(species1View);
     }

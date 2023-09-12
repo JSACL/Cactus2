@@ -71,6 +71,7 @@ public interface ILaser : IEntity
 {
     float DamageForVitality { get; }
     float DamageForResilience { get; }
+    float Length { get; }
 
     event EventHandler? ShowEffect;
 
@@ -141,5 +142,5 @@ public interface IPlayer : IHumanoid
 
 public interface ISpecies1 : IAnimal
 {
-
+    ReadOnlySpan<Vector3> TargetCoordinates { get; set; }
 }

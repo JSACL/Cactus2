@@ -4,52 +4,53 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-public class Context<TIndex> : IEquatable<Context<TIndex>?> where TIndex : Context<TIndex>.Index
+public class Context
 {
-    readonly List<WeakReference<TIndex>> _refs;
+    protected readonly List<WeakReference> _refs = new();
 
-    public Context()
-    {
-        _refs = new();
-    }
-
-    public IndexCollection Indexes => new(this);
-
-    public override bool Equals(object? obj) => Equals(obj as Context<TIndex>);
-    public bool Equals(Context<TIndex>? other) => other is not null && ReferenceEquals(_refs, other._refs);
+    public override bool Equals(object? obj) => Equals(obj as Context);
+    public bool Equals(Context? other) => other is not null && ReferenceEquals(_refs, other._refs);
     public override int GetHashCode() => HashCode.Combine(_refs);
 
-    public static bool operator ==(Context<TIndex>? left, Context<TIndex>? right) => EqualityComparer<Context<TIndex>?>.Default.Equals(left, right);
-    public static bool operator !=(Context<TIndex>? left, Context<TIndex>? right) => !(left == right);
+    public static bool operator ==(Context? left, Context? right) => EqualityComparer<Context?>.Default.Equals(left, right);
+    public static bool operator !=(Context? left, Context? right) => !(left == right);
 
-    public class Index : IEquatable<Context<TIndex>.Index?>
+    public class Index : IEquatable<Index?>
     {
-        public Context<TIndex> Context { get; }
+        public Context Context { get; }
         public int Value { get; }
 
-        public Index(Context<TIndex> context)
+        public Index(Context context)
         {
-            for (int i = 0; i < context._refs.Count; i++)
+            int i;
+            for (i = 0; i < context._refs.Count; i++)
             {
-                if (!context._refs[i].TryGetTarget(out _)) 
+                if (!context._refs[i].IsAlive) 
                 {
-                    var target = this as TIndex;
-                    Debug.Assert(target is not null);
-                    context._refs[i].SetTarget(target);
+                    context._refs[i].Target = this;
                     Value = i;
-                    break;
+                    goto fin;
                 }
             }
+            context._refs.Add(new(this));
+            Value = i;
+
+            fin:;
             Context = context;
         }
 
-        public override bool Equals(object? obj) => Equals(obj as Context<TIndex>.Index);
-        public bool Equals(Context<TIndex>.Index? other) => other is not null && EqualityComparer<Context<TIndex>>.Default.Equals(Context, other.Context) && Value == other.Value;
+        public override bool Equals(object? obj) => Equals(obj as Context.Index);
+        public bool Equals(Context.Index? other) => other is not null && EqualityComparer<Context>.Default.Equals(Context, other.Context) && Value == other.Value;
         public override int GetHashCode() => HashCode.Combine(Context, Value);
 
-        public static bool operator ==(Context<TIndex>.Index? left, Context<TIndex>.Index? right) => EqualityComparer<Context<TIndex>.Index?>.Default.Equals(left, right);
-        public static bool operator !=(Context<TIndex>.Index? left, Context<TIndex>.Index? right) => !(left == right);
+        public static bool operator ==(Context.Index? left, Context.Index? right) => EqualityComparer<Context.Index?>.Default.Equals(left, right);
+        public static bool operator !=(Context.Index? left, Context.Index? right) => !(left == right);
     }
+}
+
+public class Context<TIndex> : Context where TIndex : Context.Index
+{
+    public IndexCollection Indexes => new(this);
 
     public readonly struct IndexCollection : ICollection<TIndex>
     {
@@ -62,7 +63,7 @@ public class Context<TIndex> : IEquatable<Context<TIndex>?> where TIndex : Conte
                 int c = 0;
                 foreach (var @ref in _context._refs)
                 {
-                    if (@ref.TryGetTarget(out var i)) c++;
+                    if (@ref.IsAlive) c++;
                 }
                 return c;
             }
@@ -76,10 +77,9 @@ public class Context<TIndex> : IEquatable<Context<TIndex>?> where TIndex : Conte
 
         public bool Contains(TIndex item)
         {
-            var e = EqualityComparer<TIndex>.Default;
             foreach(var r in _context._refs)
             {
-                if (r.TryGetTarget(out var t) && e.Equals(t, item)) return true;
+                if (r.Target is { } t && t.Equals(item)) return true;
             }
             return false;
         }
@@ -112,8 +112,10 @@ public class Context<TIndex> : IEquatable<Context<TIndex>?> where TIndex : Conte
             public bool MoveNext()
             {
                 var refs = _indexes._context._refs;
-                do if (refs.Count <= ++_i) return false;
-                while (!refs[_i].TryGetTarget(out _c));
+                re:;
+                if (refs.Count <= ++_i) return false;
+                if (refs[_i].Target is not TIndex c) goto re;
+                _c = c;
                 return true;
             }
             public void Reset()
