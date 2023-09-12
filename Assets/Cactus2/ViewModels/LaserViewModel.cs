@@ -54,6 +54,9 @@ public class LaserViewModel : ViewModel<ILaser>
     {
         _hitEffect.SetActive(false);
 
+        if (Model is null) return;
+        _headT.SetPositionAndRotation(Model.Position, Model.Rotation);
+        _colliderT.SetPositionAndRotation(Model.Position, Model.Rotation);
         //if (_speaker != null)
         //{
         //    _speaker.transform.position = transform.position;
@@ -65,6 +68,8 @@ public class LaserViewModel : ViewModel<ILaser>
         Assert(Model is not null);
 
         Model.AddTime(Time.deltaTime);
+
+        if (Model is null) return;
 
         _headT.SetPositionAndRotation(Model.Position, Model.Rotation);
         var mid = Model.Position - 0.5f * Model.Length * (Model.Rotation * Vector3.forward);

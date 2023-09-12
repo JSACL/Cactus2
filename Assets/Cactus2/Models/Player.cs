@@ -44,7 +44,7 @@ public class Player : Humanoid, IPlayer
 
     public void Fire(float timeSpan)
     {
-        if (_items is IWeapon weapon)
+        if (_items[SelectedItemIndex] is IWeapon weapon)
         {
             weapon.Trigger();
         }

@@ -43,7 +43,7 @@ public class Species1ViewModel : ViewModel<ISpecies1>
 
         Cursor.lockState = CursorLockMode.Locked;
 
-        Model.TargetCoordinates = new Vector3[] { new vec(40, 0, 0) };
+        Model.TargetCoordinates = new Vector3[] { new vec(10, 0, 0) };
     }
 
     private void Update()

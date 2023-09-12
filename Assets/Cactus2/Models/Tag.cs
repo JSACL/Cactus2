@@ -39,6 +39,6 @@ public class Tag : Context.Index
         return new Tag(name);
     }
 
-    public static Tag Unknown { get; } = new("Unknown");
-    public static Tag NaturalStructure => new("Natural");
+    public static Tag Unknown { get; } = new("unknown");
+    public static Tag NaturalStructure => new("natural");
 }

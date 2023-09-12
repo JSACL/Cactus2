@@ -61,6 +61,7 @@ public class FugaEnemy : Animal, ISpecies1
                 Visitor = Visitor,
                 Position = Position,
                 Velocity = 100 * v_n,
+                Tag = Tag,
                 Rotation = Quaternion.LookRotation(v),
             };
         }
