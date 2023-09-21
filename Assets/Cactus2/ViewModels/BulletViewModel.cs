@@ -22,7 +22,9 @@ public class BulletViewModel : ViewModel<IBullet>
     [SerializeField]
     AudioSource _audioSource;
     [SerializeField]
-    TriggerEventSource _bodyTES;
+    TriggerComponent _bodyTES;
+    [SerializeField]
+    HarmfulObjectComponent _bodyHOC;
 
     [Header("ˆê’è‹——£‚É‹ß‚Ã‚¢‚½‚ç–Ú•W‚É‚­‚Á‚Â‚­B‚‘¬‚ÌUŒ‚‚ğˆÀ’è‚³‚¹‚éB")]
     public bool AttachTarget;
@@ -46,16 +48,11 @@ public class BulletViewModel : ViewModel<IBullet>
     {
         _bodyTES.Enter += (_, e) =>
         {
-            if (e.Other.GetComponentSC<TargetComponent>() is { } tC)
-            {
-                var j = IReferee.Current.Judge(Model.Tag, tC.Tag);
-                if (j == Judgement.Valid)
-                {
-                    tC.InflictToHitPoint(Model.DamageForVitality);
-                    tC.InflictToRepairPoint(Model.DamageForResilience);
-                    Model.Hit();
-                }
-            }
+            Referee.JudgeCollisionEnter(_bodyHOC.gameObject, e.Other.gameObject);
+        };
+        _bodyHOC.Hit += (sender, e) =>
+        {
+            ShowEffect(sender, e);
         };
     }
 
@@ -78,6 +75,8 @@ public class BulletViewModel : ViewModel<IBullet>
         Assert(Model is not null);
 
         Model.AddTime(Time.deltaTime);
+
+        if (Model is null) return;
 
         transform.position = Model.Position;
         transform.rotation = Model.Rotation;

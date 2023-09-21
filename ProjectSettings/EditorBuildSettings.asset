@@ -4,6 +4,15 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Cactus2/Scenes/InitialScene.unity
+    guid: 8dfdf15fdd9c37d43bba69d111673e57
+  - enabled: 1
+    path: Assets/Cactus2/Scenes/DebugScene.unity
+    guid: c1759d802dcc74949854ff985aa47d71
+  - enabled: 1
+    path: Assets/Cactus2/Scenes/AnotherScene.unity
+    guid: 1e943af2acb85824a974fb77d939bb55
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 750d333a913f7954b8fc40bd380a011d, type: 2}

@@ -6,6 +6,8 @@ using static UnityEngine.GraphicsBuffer;
 
 public class Bullet : Entity, IBullet
 {
+    readonly DateTime _due;
+
     public override IVisitor? Visitor
     {
         get => base.Visitor;
@@ -27,6 +29,8 @@ public class Bullet : Entity, IBullet
 
     public Bullet(DateTime time) : base(time)
     {
+        _due = time + new TimeSpan(0, 0, 20);
+
         Tag = Tag.Unknown;
     }
 
@@ -44,6 +48,8 @@ public class Bullet : Entity, IBullet
         base.Update(deltaTime);
 
         Track(deltaTime);
+
+        if (Time > _due) Visitor = null;
     }
 
     protected void Track(float deltaTime)

@@ -396,6 +396,7 @@ GameObject:
   - component: {fileID: 3274717702096737106}
   - component: {fileID: 3274717702096737110}
   - component: {fileID: 708993827031191960}
+  - component: {fileID: 820902882560122618}
   m_Layer: 23
   m_Name: Bullet
   m_TagString: Untagged
@@ -510,6 +511,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec541988d8f2a724a931873627585f3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &820902882560122618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3274717702096737104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8803d623abc396347b542ab868689620, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8122715379943040534
 GameObject:
   m_ObjectHideFlags: 0
@@ -563,6 +576,7 @@ MonoBehaviour:
   _hitEffect: {fileID: 3274717701519755602}
   _audioSource: {fileID: 3274717701293412765}
   _bodyTES: {fileID: 708993827031191960}
+  _bodyHOC: {fileID: 820902882560122618}
   AttachTarget: 0
   AttachDistance: 0
   Attached: 0

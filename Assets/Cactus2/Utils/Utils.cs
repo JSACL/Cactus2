@@ -7,6 +7,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using static UnityEngine.ParticleSystem;
+using System.Linq;
 
 public static class Utils
 {
@@ -88,5 +89,30 @@ public static class Utils
             if (@this.GetChild(i).GetComponentIC<T>(name, includeInactive) is { } r_) return r_;
         }
         return null;
+    }
+
+    public static IEnumerable<TComponent> WithinSight<TComponent>(this IEnumerable<TComponent> @this, Vector3 p, Quaternion d, float x, float y) where TComponent : Component
+    {
+        return @this.Where(P);
+
+        bool P(Component c)
+        {
+            var v = c.transform.position - p;
+            var v_f = Quaternion.Inverse(d) * v;
+            return v_f.z <= x * v_f.x || v_f.y <= y * v_f.x;
+        }
+    }
+    public static IEnumerable<TComponent> WithinSight<TComponent>(this IEnumerable<TComponent> @this, Vector3 p, Quaternion d, float r) where TComponent : Component
+    {
+        return @this.Where(P);
+
+        bool P(Component c)
+        {
+            var v = c.transform.position - p;
+            var v_f = Quaternion.Inverse(d) * v;
+            var x = v_f.x;
+            v_f.x = 0;
+            return v_f.sqrMagnitude <= r * x * r * x;
+        }
     }
 }

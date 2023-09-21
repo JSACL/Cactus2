@@ -28,6 +28,7 @@ public class Animal : Entity, IAnimal
     public float Resilience { get => _resilience; set => _resilience = Clamp(value, 0, 1); }
 
     public event AnimationTransitionEventHandler? TransitBodyAnimation;
+    public event EventHandler? Died;
 
     public Animal(DateTime time) : base(time)
     {
@@ -47,10 +48,13 @@ public class Animal : Entity, IAnimal
 
     public virtual void InflictOnVitality(float strength)
     {
-        Vitality -= strength;
+        Vitality -= Resilience <= 0 ? strength : strength * 2;
+
+        if (Vitality <= 0) Died?.Invoke(this, EventArgs.Empty);
     }
     public virtual void InflictOnResilience(float damage)
     {
         Resilience -= damage;
+        if (Resilience < 0) Resilience = 0;
     }
 }

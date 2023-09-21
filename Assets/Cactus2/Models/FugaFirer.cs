@@ -16,7 +16,7 @@ public class FugaFirer : Weapon, IFirer
             Tag = tag,
             Rotation = Rotation,
             Position = Position,
-            Velocity = Rotation * (InitialSpeed * Vector3.forward),
+            Velocity = Rotation * (20 * Vector3.forward),
             Visitor = Visitor
         };
     }

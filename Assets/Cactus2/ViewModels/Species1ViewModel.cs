@@ -11,29 +11,27 @@ using static Utils;
 using vec = UnityEngine.Vector3;
 using qtn = UnityEngine.Quaternion;
 using System.Reflection;
+using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+using System.Collections;
 
-public class Species1ViewModel : ViewModel<ISpecies1>
+public class Species1ViewModel : RigidbodyViewModel<ISpecies1>
 {
-    const float ADJUSTMENT_PROMPTNESS = 3f;
+    DateTime _nextTimeToSearch;
+    TargetCoordinates _tC;
 
     [Header("Internal")]
     [SerializeField]
     int _groundCount_onFoot;
     [Header("External")]
     [SerializeField]
-    Rigidbody _rigidbody = null!;
+    ColliderComponent _bodyCES = null!;
     [SerializeField]
-    CollisionEventSource _bodyCES = null!;
+    TriggerComponent _footTES = null!;
     [SerializeField]
-    TriggerEventSource _footTES = null!;
-
-    protected Rigidbody Rigidbody => _rigidbody;
-    private protected vec Position
-    //{ get; set; }
-    { get => _rigidbody.position; set => _rigidbody.position = value; }
-    private protected qtn Rotation
-    //{ get; set; }
-    { get => _rigidbody.rotation; set => _rigidbody.rotation = value; }
+    TargetComponent _targetComponent = null!;
+    [SerializeField]
+    Transform _eyeT = null!;
 
     void Start()
     {
@@ -41,44 +39,16 @@ public class Species1ViewModel : ViewModel<ISpecies1>
         _footTES.Exit += (_, e) => { if (e.Other.gameObject.layer is LAYER_GROUND) _groundCount_onFoot--; };
         _bodyCES.Stay += (_, e) => { Model?.Impulse(Model.Position, e.Impulse); };
 
-        Cursor.lockState = CursorLockMode.Locked;
+        _targetComponent.Tag = Model.Tag;
 
-        Model.TargetCoordinates = new Vector3[] { new vec(10, 0, 0) };
+        Model.TargetCoordinates = _tC = new ConeTargetCoordinates(Model.Tag, 100, 80);
     }
 
-    private void Update()
+    protected new void Update()
     {
-        Assert(Model is not null);
+        base.Update();
 
-        // V -> VM
-        // VM -> M ...?
-        Model.AddTime(Time.deltaTime);
-    }
-
-    void FixedUpdate()
-    {
-        Assert(Model is not null);
-
-        // M -> VM
-        //Rigidbody.AddForce(10f * (Model.Position - Position));
-        //Rigidbody.AddTorque(10f * (qtn.Inverse(Rotation) * Model.Rotation).eulerAngles);
-        var ratio = 1 - Exp(-ADJUSTMENT_PROMPTNESS * Time.deltaTime);
-        // transform‚ðmodel‚Ö“K‚©‚·B
-        //Position += ratio * (Model.Position - Position);
-        Position = vec.Lerp(Position, Model.Position, ratio);
-        //Debug.Log($"{Model.Position - Position} {Model.Position} {Position}");
-        //Rotation = (qtn.Inverse(Rotation) * Model.Rotation).Multiply(by: 1) * Rotation;
-        Rotation = qtn.Lerp(Rotation, Model.Rotation, ratio);
-
-        Rigidbody.velocity = Model.Velocity;
-        Rigidbody.angularVelocity = Model.AngularVelocity;
-        ////Debug.Log($"{(qtn.Inverse(Rotation) * Model.Rotation).eulerAngles} {Rotation}");
-        Rigidbody.mass = Model.Mass;
-
-        //// VM -> V
-        //Rigidbody.position = Position;
-        //Rigidbody.rotation = Rotation;
-        //Rigidbody.velocity = Velocity;
-        //Rigidbody.angularVelocity = AngularVelocity;
+        _tC.EyePoint = _eyeT.position;
+        _tC.EyeRotation = _eyeT.rotation;
     }
 }

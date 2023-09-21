@@ -9,23 +9,12 @@ using DB = System.Diagnostics.DebuggerBrowsableAttribute;
 using SF = UnityEngine.SerializeField;
 using DBS = System.Diagnostics.DebuggerBrowsableState;
 using GOS = IObjectSource<UnityEngine.GameObject>;
-using Unity.VisualScripting;
 using System.Collections;
+using UnityEngine.SceneManagement;
+using System.Threading.Tasks;
 
-public class LocalVisitor : MonoBehaviour, IVisitor
+public class LocalHostVisitor : IVisitor
 {
-    //[Header("開始時充現有View以新Model否")]
-    //[SF]
-    //bool _attachModelOnStarting;
-    [Header("掟各対Model所応ViewModel")]
-    public GameObject playerView;
-    public GameObject combatUIView;
-    public GameObject firerView;
-    public GameObject bulletView;
-    public GameObject laserView;
-    public GameObject entityView;
-    public GameObject species1View;
-
     readonly ArrayViewModels<IPlayer> _players = new();
     readonly SingleViewModels<IEntity> _firers = new();
     readonly SingleViewModels<IBullet> _bullets = new();
@@ -33,14 +22,20 @@ public class LocalVisitor : MonoBehaviour, IVisitor
     readonly SingleViewModels<IEntity> _entities = new();
     readonly SingleViewModels<ISpecies1> _species1s = new();
 
-    private void Awake()
+    public Scene Scene { get; }
+
+    public LocalHostVisitor(Scene scene)
     {
-        _players.GameObjectSources = new GOS[] { new GameObjectSource(playerView), new GameObjectSource(combatUIView) };
-        _firers.GameObjectSource = new GameObjectSource(firerView);
-        _bullets.GameObjectSource = new GameObjectPool(bulletView);
-        _lasers.GameObjectSource = new GameObjectPool(laserView);
-        _entities.GameObjectSource = new GameObjectSource(entityView);
-        _species1s.GameObjectSource = new GameObjectSource(species1View);
+        Scene = scene;
+
+        _players.GameObjectSources = new GOS[] { new GameObjectSource(P("Player"), Scene), new GameObjectSource(P("CombatUI"), Scene) };
+        _firers.GameObjectSource = new GameObjectSource(P("Firer"), Scene);
+        _bullets.GameObjectSource = new GameObjectSource(P("Bullet"), Scene);
+        _lasers.GameObjectSource = new GameObjectSource(P("Laser"), Scene);
+        _entities.GameObjectSource = new GameObjectSource(P("Entity"), Scene);
+        _species1s.GameObjectSource = new GameObjectSource(P("Species1"), Scene);
+
+        static string P(string name) => $"Assets/Cactus2/Views/{name}.prefab";
     }
 
     public void Add(IPlayer model) => _players.Add(model);
@@ -80,12 +75,12 @@ public class SingleViewModels<TModel> : ICollection<TModel> where TModel : class
 
     public int Count => _vMs.Count;
     public bool IsReadOnly => false;
-    public void Add(TModel item)
+    public async void Add(TModel item)
     {
         if (!_vMs.TryGetValue(item, out var vM))
         {
             if (_objectSource is null) throw new InvalidOperationException();
-            vM = _objectSource.Get().GetComponent<ViewModel<TModel>>();
+            vM = (await _objectSource.GetAsync()).GetComponent<ViewModel<TModel>>();
             _vMs.Add(item, vM);
         }
         vM.Model = item;
@@ -94,17 +89,25 @@ public class SingleViewModels<TModel> : ICollection<TModel> where TModel : class
     public bool Contains(TModel item) => throw new NotImplementedException();
     public void CopyTo(TModel[] array, int arrayIndex) => throw new NotImplementedException();
     public IEnumerator<TModel> GetEnumerator() => _vMs.Keys.GetEnumerator();
-    public bool Remove(TModel item)
+    public async void Remove(TModel item)
     {
         if (_vMs.TryGetValue(item, out var vM))
         {
             if (_objectSource is null) throw new InvalidOperationException();
-            _objectSource.Release(vM.gameObject);
+            await _objectSource.ReleaseAsync(vM.gameObject);
             vM.Model = null;
             _ = _vMs.Remove(item);
+        }
+    }
+    void ICollection<TModel>.Add(TModel item) => Add(item);
+    bool ICollection<TModel>.Remove(TModel item)
+    {
+        if (_vMs.ContainsKey(item))
+        {
+            Remove(item);
             return true;
         }
-        return false;
+        else return false;
     }
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
@@ -134,12 +137,15 @@ public class ArrayViewModels<TModel> : ICollection<TModel> where TModel : class
 
     public int Count => _vMs.Count;
     public bool IsReadOnly => false;
-    public void Add(TModel item)
+    public async void Add(TModel item)
     {
         if (!_vMs.TryGetValue(item, out var vMs))
         {
-            // 同一の対象に属するViewModelは隣接することに基づく異同判定。
-            vMs = _objectSources.SelectMany(x => x.Get().GetComponents<ViewModel<TModel>>()).ToArray();
+            vMs = new ViewModel<TModel>[_objectSources.Length];
+            for (int i = 0; i < vMs.Length; i++)
+            {
+                vMs[i] = (await _objectSources[i].GetAsync()).GetComponent<ViewModel<TModel>>();
+            }
             _vMs.Add(item, vMs);
         }
         foreach (var vM in vMs) vM.Model = item;
@@ -148,18 +154,24 @@ public class ArrayViewModels<TModel> : ICollection<TModel> where TModel : class
     public bool Contains(TModel item) => throw new NotImplementedException();
     public void CopyTo(TModel[] array, int arrayIndex) => throw new NotImplementedException();
     public IEnumerator<TModel> GetEnumerator() => _vMs.Keys.GetEnumerator();
-    public bool Remove(TModel item)
+    public async void Remove(TModel item)
     {
         if (_vMs.TryGetValue(item, out var vMs))
         {
-            var last = default(GameObject);
-            foreach (var vM in vMs) vM.Model = null;
-            for (int i = 0; i < vMs.Length; i++) 
-            { 
-                if (last != vMs[i].gameObject) _objectSources[i].Release(vMs[i].gameObject);
-                last = vMs[i].gameObject;
+            //foreach (var vM in vMs) vM.Model = null;
+            for (int i = 0; i < vMs.Length; i++)
+            {
+                vMs[i].Model = null;
+                await _objectSources[i].ReleaseAsync(vMs[i].gameObject);
             }
             _ = _vMs.Remove(item);
+        }
+    }
+    bool ICollection<TModel>.Remove(TModel item)
+    {
+        if (_vMs.ContainsKey(item))
+        {
+            Remove(item);
             return true;
         }
         return false;

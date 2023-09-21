@@ -12,7 +12,6 @@ using vec = UnityEngine.Vector3;
 
 public class Player : Humanoid, IPlayer
 {
-
     int _itemNumber;
     readonly List<IItem> _items;
 

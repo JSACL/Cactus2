@@ -7,12 +7,17 @@ using vec = UnityEngine.Vector3;
 
 public class EntityViewModel : ViewModel<IEntity>
 {
-    private void Update()
+    protected void Update()
     {
         Assert(Model is { });
 
         Model.AddTime(Time.deltaTime);
+    }
 
-        transform.SetPositionAndRotation(transform.position, transform.rotation);
+    protected void LateUpdate()
+    {
+        if (Model is null) return;
+
+        transform.SetPositionAndRotation(Model.Position, Model.Rotation);
     }
 }

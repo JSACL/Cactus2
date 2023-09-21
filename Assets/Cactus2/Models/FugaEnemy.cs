@@ -1,5 +1,7 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using static ConstantValues;
@@ -16,7 +18,7 @@ public class FugaEnemy : Animal, ISpecies1
     float _cooldownTime_rest;
     float _charge_rest = 0;
     Laser? _laserHavingFired;
-    Vector3[] _targetCoordinates;
+    readonly CachedCollection<Vector3> _targetCoordinates;
 
     public override IVisitor? Visitor
     {
@@ -28,19 +30,15 @@ public class FugaEnemy : Animal, ISpecies1
             _visitor?.Add(this);
         }
     }
-    public ReadOnlySpan<Vector3> TargetCoordinates
+    public IEnumerable<Vector3> TargetCoordinates
     {
         get => _targetCoordinates;
-        set
-        {
-            Array.Resize(ref _targetCoordinates, value.Length);
-            value.CopyTo(_targetCoordinates);
-        }
+        set => _targetCoordinates.InnerEnumerable = value;
     }
 
     public FugaEnemy(DateTime time) : base(time)
     {
-        _targetCoordinates = Array.Empty<Vector3>();
+        _targetCoordinates = new();
         _rand = new Random();
     }
 
@@ -54,16 +52,20 @@ public class FugaEnemy : Animal, ISpecies1
             _cooldownTime_rest += 5;
             _charge_rest += 0.1f;
 
-            var v = _targetCoordinates[_rand.Next(_targetCoordinates.Length - 1)] - Position;
-            var v_n = v.normalized;
-            _laserHavingFired = new Laser(Time)
+            _targetCoordinates.Update();
+            if (_targetCoordinates.Any())
             {
-                Visitor = Visitor,
-                Position = Position,
-                Velocity = 100 * v_n,
-                Tag = Tag,
-                Rotation = Quaternion.LookRotation(v),
-            };
+                var v = _targetCoordinates[_rand.Next(_targetCoordinates.Count - 1)] - Position;
+                var v_n = v.normalized;
+                _laserHavingFired = new Laser(Time)
+                {
+                    Visitor = Visitor,
+                    Position = Position,
+                    Velocity = 100 * v_n,
+                    Tag = Tag,
+                    Rotation = Quaternion.LookRotation(v),
+                };
+            }
         }
 
         if (_charge_rest < 0)

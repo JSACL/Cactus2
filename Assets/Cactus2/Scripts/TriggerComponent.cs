@@ -1,6 +1,7 @@
 using UnityEngine;
 
-public class TriggerEventSource : MonoBehaviour
+[RequireComponent(typeof(Rigidbody))]
+public class TriggerComponent : MonoBehaviour
 {
     public event ColliderEventHandler Enter;
     public event ColliderEventHandler Stay;

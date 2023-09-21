@@ -20,7 +20,9 @@ public class LaserViewModel : ViewModel<ILaser>
     [SerializeField]
     AudioSource _audioSource;
     [SerializeField]
-    TriggerEventSource _bodyTES;
+    TriggerComponent _bodyTES;
+    [SerializeField]
+    HarmfulObjectComponent _bodyHOC;
 
     protected override void Connect()
     {
@@ -35,18 +37,15 @@ public class LaserViewModel : ViewModel<ILaser>
 
     void Start()
     {
+        _bodyHOC.Tag = Model.Tag;
+
         _bodyTES.Enter += (_, e) =>
         {
-            if (e.Other.GetComponentSC<TargetComponent>() is { } tC)
-            {
-                var j = IReferee.Current.Judge(Model.Tag, tC.Tag);
-                if (j == Judgement.Valid)
-                {
-                    tC.InflictToHitPoint(Model.DamageForVitality);
-                    tC.InflictToRepairPoint(Model.DamageForResilience);
-                    Model.Hit();
-                }
-            }
+            Referee.JudgeCollisionEnter(_bodyHOC.gameObject, e.Other.gameObject);
+        };
+        _bodyHOC.Hit += (sender, e) =>
+        {
+            ShowEffect(sender, e);
         };
     }
 

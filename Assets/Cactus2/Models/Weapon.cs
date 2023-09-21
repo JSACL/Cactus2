@@ -19,7 +19,6 @@ public abstract class Weapon : Entity, IWeapon
     }
     public float CooldownTimeRemaining => _cooldownTimeRemaining;
     public virtual float CooldownTime => 1f;
-    public virtual float InitialSpeed => 5f;
     public TeamGameReferee.Team Team { get; set; }
 
     public Weapon(DateTime time, TeamGameReferee.Team team) : base(time)

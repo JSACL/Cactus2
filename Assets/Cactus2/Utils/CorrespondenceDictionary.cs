@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using static System.Math;
 
+[Obsolete]
 public class CorrespondenceDictionary<TKey, TValue> : IDictionary<TKey, TValue> where TKey : Context.Index where TValue : notnull
 {
     readonly Context<TKey> _context;
@@ -23,7 +24,7 @@ public class CorrespondenceDictionary<TKey, TValue> : IDictionary<TKey, TValue> 
         }
     }
 
-    public Context<TKey>.IndexCollection Keys => _context.Indexes;
+    public IndexCollection Keys => new(this);
     public SkipNullArrayCollection<TValue> Values => new(_arr);
     public int Count => Values.Count;
     public bool IsReadOnly => false;
@@ -147,4 +148,28 @@ public class CorrespondenceDictionary<TKey, TValue> : IDictionary<TKey, TValue> 
     bool IDictionary<TKey, TValue>.Remove(TKey key) => TryRemove(key);
     ICollection<TKey> IDictionary<TKey, TValue>.Keys => Keys;
     ICollection<TValue> IDictionary<TKey, TValue>.Values => Values;
+
+    public readonly struct IndexCollection : ICollection<TKey>
+    {
+        readonly CorrespondenceDictionary<TKey, TValue> _p;
+        public IndexCollection(CorrespondenceDictionary<TKey, TValue> p) { _p = p; }
+        public int Count => _p.Values.Count;
+        public bool IsReadOnly => true;
+        public bool Contains(TKey item)
+        {
+            return _p._arr.Length > item.Value && _p._arr[item.Value] is not null;
+        }
+        public void CopyTo(TKey[] array, int arrayIndex) => throw new NotImplementedException();
+        public IEnumerator<TKey> GetEnumerator()
+        {
+            foreach (var item in _p._context.Indexes)
+            {
+                if (_p._arr[item.Value] is not null) yield return item;
+            }
+        }
+        void ICollection<TKey>.Add(TKey item) => throw new NotImplementedException();
+        void ICollection<TKey>.Clear() => throw new NotImplementedException();
+        bool ICollection<TKey>.Remove(TKey item) => throw new NotImplementedException();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
 }

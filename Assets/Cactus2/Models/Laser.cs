@@ -16,8 +16,8 @@ public class Laser : Entity, ILaser
             _visitor?.Add(this);
         }
     }
-    public float DamageForVitality { get; }
-    public float DamageForResilience { get; }
+    public float DamageForVitality { get; } = 0.2f;
+    public float DamageForResilience { get; } = 0.1f;
     public float Length { set;  get; }
     public float Strength { private set; get; } = 200;
     public event EventHandler? ShowEffect;

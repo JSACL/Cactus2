@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 4110388248862740270}
   - component: {fileID: 4351851096900964001}
   - component: {fileID: 1947235165932079712}
+  - component: {fileID: 7484279549697046756}
   m_Layer: 0
   m_Name: Body
   m_TagString: Untagged
@@ -140,6 +141,49 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec541988d8f2a724a931873627585f3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &7484279549697046756
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 986914194101274908}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 484dc1e4f35ec884780bb395c78d8b81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &3087909383196483256
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6818657682399487949}
+  m_Layer: 0
+  m_Name: Eye
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6818657682399487949
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3087909383196483256}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5455634655992551222}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4026298100446359276
 GameObject:
   m_ObjectHideFlags: 0
@@ -170,6 +214,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2666600982110695674}
+  - {fileID: 6818657682399487949}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -185,7 +230,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7fd7fc91a5bcc843a6885d10b3ec012, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _groundCount_onFoot: 0
   _rigidbody: {fileID: 4110388248862740270}
+  _groundCount_onFoot: 0
   _bodyCES: {fileID: 4351851096900964001}
   _footTES: {fileID: 1947235165932079712}
+  _targetComponent: {fileID: 7484279549697046756}
+  _eyeT: {fileID: 6818657682399487949}

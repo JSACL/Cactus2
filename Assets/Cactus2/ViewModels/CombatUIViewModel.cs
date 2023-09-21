@@ -30,6 +30,28 @@ public class CombatUIViewModel : ViewModel<IPlayer>
     [SerializeField]
     GameObject _focusPanel;
 
+    [Header("Ž€–SŽž‰æ–Ê")]
+    [SerializeField]
+    GameObject _died;
+
+    protected override void Connect()
+    {
+        base.Connect();
+
+        Model.Died += Model_Died;
+    }
+    protected override void Disconnect()
+    {
+        Model.Died -= Model_Died;
+
+        base.Disconnect();
+    }
+
+    private void Model_Died(object sender, EventArgs e)
+    {
+        _died.SetActive(true);
+    }
+
     void Start()
     {
         _initialGaugeLengthes_cooldownTime = _gaugePanels_cooldownTime.Select(x => x.transform.localScale.x).ToArray();

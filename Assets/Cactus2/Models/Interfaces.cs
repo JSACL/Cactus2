@@ -9,8 +9,12 @@ public interface IReferee
 {
     Judgement Judge(Tag offensiveSide, Tag defensiveSide);
     Task<Judgement> JudgeAsync(Tag offensiveSide, Tag defensiveSide) => Task.FromResult(Judge(offensiveSide, defensiveSide));
+    [Obsolete]
+    Judgement Judge(ITagged offensiveSide, ITagged defensiveSide);
+    [Obsolete]
+    Task<Judgement> JudgeAsync(ITagged offensiveSide, ITagged defensiveSide) => Task.FromResult(Judge(offensiveSide, defensiveSide));
 
-    static IReferee Current { get; set; } = SuperiourReferee.Topmost;
+    static IReferee Current { get; set; } = SuperiorReferee.Topmost;
 }
 
 public interface IVisible
@@ -18,7 +22,12 @@ public interface IVisible
     IVisitor? Visitor { get; set; }
 }
 
-public interface IEntity : IVisible
+public interface ITagged
+{
+    Tag Tag => Tag.Unknown;
+}
+
+public interface IEntity : IVisible, ITagged
 {
     Vector3 Position { get; set; }
     Vector3 Velocity { get; }
@@ -26,7 +35,6 @@ public interface IEntity : IVisible
     Vector3 AngularVelocity { get; }
     DateTime Time { get; set; }
     float Mass { get; }
-    Tag Tag => Tag.Unknown;
 
     void Rotate(float angle, Vector3 axis) => Rotate(Quaternion.AngleAxis(angle, axis));
     [Obsolete]
@@ -87,10 +95,10 @@ public interface IEphemeral
 {
     float Vitality { get; }
     float Resilience { get; }
+    event EventHandler? Died;
 
     void InflictOnVitality(float damage);
     void InflictOnResilience(float damage);
-    
 }
 
 public interface IAnimal : IEntity, IEphemeral
@@ -142,5 +150,5 @@ public interface IPlayer : IHumanoid
 
 public interface ISpecies1 : IAnimal
 {
-    ReadOnlySpan<Vector3> TargetCoordinates { get; set; }
+    IEnumerable<Vector3> TargetCoordinates { get; set; }
 }

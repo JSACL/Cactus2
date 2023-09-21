@@ -6,24 +6,20 @@ using static System.MathF;
 using vec = UnityEngine.Vector3;
 using qtn = UnityEngine.Quaternion;
 
-public class HumanoidViewModel : ViewModel<IHumanoid>
+public class HumanoidViewModel<TModel> : RigidbodyViewModel<TModel> where TModel : class, IHumanoid
 {
-    const float ADJUSTMENT_PROMPTNESS = 3f;
-
     [SerializeField]
     List<GroundComponent> _groundComponents = new();
     [SerializeField]
-    Rigidbody _rigidbody = null!;
-    [SerializeField]
     Animator _animator = null!;
     [SerializeField]
-    Camera _camera = null!;
+    Transform _eyeT = null!;
     [SerializeField]
-    CollisionEventSource _bodyCES = null!;
+    ColliderComponent _bodyCES = null!;
     [SerializeField]
-    TriggerEventSource _footTES = null!;
+    TriggerComponent _footTES = null!;
     [SerializeField]
-    TargetComponent _bodyIES = null!;
+    TargetComponent _bodyTC = null!;
 
     protected override void Connect()
     {
@@ -36,10 +32,9 @@ public class HumanoidViewModel : ViewModel<IHumanoid>
         base.Disconnect();
     }
 
-    void Start()
+    protected void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        _bodyIES.Tag = Model.Tag;
+        _bodyTC.Tag = Model.Tag;
 
         _footTES.Enter += (_, e) =>
         {
@@ -55,32 +50,30 @@ public class HumanoidViewModel : ViewModel<IHumanoid>
         {
             Model.Impulse(Model.Position, e.Impulse);
         };
-        _bodyIES.HitPointInflicted += async (_, e) =>
+        _bodyTC.HitPointInflicted += (_, e) =>
         {
             Model.InflictOnVitality(e);
         };
+        _bodyTC.RepairPointInflicted += (_, e) =>
+        {
+            Model.InflictOnResilience(e);
+        };
     }
 
-    private void Update()
+    protected new void Update()
     {
+        base.Update();
+
         Model.FootIsOn = _groundComponents.Count > 0;
-        Model.AddTime(Time.deltaTime);
-    }
+        Model.Impulse(Model.Position, Time.deltaTime * Model.Mass * Physics.gravity);
 
-    void FixedUpdate()
-    {
-        var ratio = 1 - Exp(-ADJUSTMENT_PROMPTNESS * Time.deltaTime);
-        _rigidbody.position = vec.Lerp(_rigidbody.position, Model.Position, ratio);
-        _rigidbody.rotation = qtn.Lerp(_rigidbody.rotation, Model.Rotation, ratio);
-
-        _rigidbody.velocity = Model.Velocity;
-        _rigidbody.angularVelocity = Model.AngularVelocity;
-        _camera.transform.localRotation = Model.HeadRotation;
-        _rigidbody.mass = Model.Mass;
+        _eyeT.localRotation = Model.HeadRotation;
     }
 
     void TransitBodyAnimation(object? sender, AnimationTransitionEventArgs e)
     {
+        Assert(_animator is not null);
+
         e.Apply(to: _animator);
     }
 }

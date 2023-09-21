@@ -12,7 +12,7 @@ using Unity.VisualScripting;
 public class Tag : Context.Index
 {
     readonly string _name;
-    readonly CorrespondenceDictionary<Tag, Relationship> _relationships;
+    readonly CorrespondenceTable<Tag, Relationship> _relationships;
 
     public string Name => _name;
 
