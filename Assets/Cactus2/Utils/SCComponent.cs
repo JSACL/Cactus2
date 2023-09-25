@@ -11,7 +11,7 @@ public class SCComponent : MonoBehaviour
         var info = SCComponentInfo.GetInfo(GetType());
         if (info.ShortCircuitIsAvailable)
         {
-            gameObject.layer |= info.LayerMask;
+            gameObject.layer |= info.LayerMask!;
         }
     }
 }
@@ -19,24 +19,13 @@ public class SCComponent : MonoBehaviour
 public class SCComponentInfo
 {
     public bool ShortCircuitIsAvailable { get; private set; }
-    public int LayerMask { get; private set; }
+    public DynamicMask LayerMask { get; private set; } = default;
 
     public SCComponentInfo(Type type)
     {
-        F<GroundComponent>();
-        F<TargetComponent>();
-
-        void F<TComponent>()
-        {
-            if (type == typeof(TComponent)) 
-            { 
-                ShortCircuitIsAvailable = true;
-                LayerMask = _availableLayerMask++;
-            }
-        }
+        ShortCircuitIsAvailable = true;
+        LayerMask = DynamicMask.GetNew(SceneConfiguration.Current.LayerMaskProvider, $"To short-circuit component: {type.Name}.");
     }
-
-    static int _availableLayerMask = 10;
 
     public static SCComponentInfo GetInfo(Type type)
     {

@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider))]
-public class TargetComponent : SCComponent, ITagged
+public class TargetComponent : SCComponent, IParticipant
 {
     LinkedListNode<TargetComponent>? _node;
-    Tag _tag = Tag.Unknown;
+    ParticipantIndex _tag = ParticipantIndex.Unknown;
 
-    public Tag Tag
+    public ParticipantIndex ParticipantIndex
     {
         get => _tag;
         set
@@ -29,17 +29,17 @@ public class TargetComponent : SCComponent, ITagged
     }
     public event EventHandler<float>? HitPointInflicted;
     public event EventHandler<float>? RepairPointInflicted;
-    public event EventHandler? Aimed;
+    //public event EventHandler? Aimed;
 
     void OnEnable()
     {
-        if (Tag is null) return;
-        _targetComponents[Tag] ??= new();
-        _node = _targetComponents[Tag]!.AddLast(this);
+        if (ParticipantIndex is null) return;
+        _targetComponents[ParticipantIndex] ??= new();
+        _node = _targetComponents[ParticipantIndex]!.AddLast(this);
     }
     void OnDisable()
     {
-        _targetComponents[Tag]?.Remove(_node!);
+        _targetComponents[ParticipantIndex]?.Remove(_node!);
     }
 
     public void InflictToHitPoint(float point)
@@ -52,12 +52,7 @@ public class TargetComponent : SCComponent, ITagged
         RepairPointInflicted?.Invoke(this, point);
     }
 
-    public void OnAimed()
-    {
-        Aimed?.Invoke(this, EventArgs.Empty);
-    }
+    readonly static CorrespondenceTable<ParticipantIndex, LinkedList<TargetComponent>?> _targetComponents = new(ParticipantIndex.Context);
 
-    readonly static CorrespondenceTable<Tag, LinkedList<TargetComponent>?> _targetComponents = new(Tag.Context);
-
-    public static IEnumerable<TargetComponent> Enableds(Tag with) => _targetComponents[with] ?? (IEnumerable<TargetComponent>)Array.Empty<TargetComponent>();
+    public static IEnumerable<TargetComponent> Enableds(ParticipantIndex with) => _targetComponents[with] ?? (IEnumerable<TargetComponent>)Array.Empty<TargetComponent>();
 }

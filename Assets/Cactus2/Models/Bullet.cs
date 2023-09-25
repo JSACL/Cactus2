@@ -31,7 +31,7 @@ public class Bullet : Entity, IBullet
     {
         _due = time + new TimeSpan(0, 0, 20);
 
-        Tag = Tag.Unknown;
+        ParticipantIndex = ParticipantIndex.Unknown;
     }
 
     public async void Hit()

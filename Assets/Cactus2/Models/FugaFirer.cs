@@ -4,16 +4,16 @@ using UnityEngine;
 
 public class FugaFirer : Weapon, IFirer
 {
-    public FugaFirer(DateTime time, TeamGameReferee.Team team) : base(time, team)
+    public FugaFirer(DateTime time) : base(time)
     {
 
     }
 
-    protected override void Fire(Tag tag)
+    protected override void Fire(ParticipantIndex tag)
     {
         var b = new Bullet(Time)
         {
-            Tag = tag,
+            ParticipantIndex = tag,
             Rotation = Rotation,
             Position = Position,
             Velocity = Rotation * (20 * Vector3.forward),

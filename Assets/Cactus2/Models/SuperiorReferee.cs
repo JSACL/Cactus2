@@ -14,7 +14,7 @@ public class SuperiorReferee : IReferee
         _inferiors = new();
     }
 
-    public Judgement Judge(Tag offensiveSide, Tag defensiveSide)
+    public Judgement Judge(ParticipantIndex offensiveSide, ParticipantIndex defensiveSide)
     {
         var j = Judgement.None;
         foreach (var referee in _inferiors)
@@ -31,7 +31,7 @@ public class SuperiorReferee : IReferee
         }
         return j;
     }
-    public async Task<Judgement> JudgeAsync(Tag offensiveSide, Tag defensiveSide)
+    public async Task<Judgement> JudgeAsync(ParticipantIndex offensiveSide, ParticipantIndex defensiveSide)
     {
         var j = Judgement.None;
         var js = await Task.WhenAll(_inferiors.Select(x => x.JudgeAsync(offensiveSide, defensiveSide)));
@@ -48,7 +48,7 @@ public class SuperiorReferee : IReferee
         }
         return j;
     }
-    public Judgement Judge(ITagged offensiveSide, ITagged defensiveSide)
+    public Judgement Judge(IParticipant offensiveSide, IParticipant defensiveSide)
     {
         var j = Judgement.None;
         foreach (var referee in _inferiors)
@@ -65,7 +65,7 @@ public class SuperiorReferee : IReferee
         }
         return j;
     }
-    public async Task<Judgement> JudgeAsync(ITagged offensiveSide, ITagged defensiveSide)
+    public async Task<Judgement> JudgeAsync(IParticipant offensiveSide, IParticipant defensiveSide)
     {
         var j = Judgement.None;
         var js = await Task.WhenAll(_inferiors.Select(x => x.JudgeAsync(offensiveSide, defensiveSide)));

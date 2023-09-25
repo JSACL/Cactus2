@@ -15,7 +15,7 @@ public class SuperintendentComponent : MonoBehaviour
     {
         TaskScheduler.UnobservedTaskException += (sender, e) => Debug.LogError(e);
 
-        var s_d = SceneManager.GetSceneByName("DebugScene");
+        var s_d = SceneManager.GetSceneByName("GeneratedScene");
 
         //SceneManager.LoadSceneAsync(s_d.buildIndex, LoadSceneMode.Additive);
         var v1 = new LocalHostVisitor(s_d);
@@ -24,7 +24,7 @@ public class SuperintendentComponent : MonoBehaviour
         ////SceneManager.LoadSceneAsync(s_a.buildIndex, LoadSceneMode.Additive);
         //var v2 = new LocalHostVisitor(s_a);
 
-        _visitor = new CompositeVisitor(v1);
+        _visitor = v1;//new CompositeVisitor(v1);
 
         Init();
     }
@@ -61,20 +61,25 @@ public class SuperintendentComponent : MonoBehaviour
         var p = new Player(dt)
         {
             Visitor = _visitor,
-            Tag = t_f.Player,
+            ParticipantIndex = t_f.Player,
             Vitality = ConstantValues.PLAYER_VIGOR_STANDARD,
             Resilience = 1.0f,
         };
         p.Died += (sender, e) => { };
-        p.Items.Add(new FugaFirer(dt, t_f) { Visitor = _visitor });
-        p.Items.Add(new FugaFirer(dt, t_f) { Visitor = _visitor });
-        p.Items.Add(new FugaFirer(dt, t_f) { Visitor = _visitor });
+        p.Items.Add(new FugaFirer(dt) { Visitor = _visitor, BulletIndex = t_f.Weapon });
+        p.Items.Add(new FugaFirer(dt) { Visitor = _visitor, BulletIndex = t_f.Weapon });
+        p.Items.Add(new FugaFirer(dt) { Visitor = _visitor, BulletIndex = t_f.Weapon });
         var s = new FugaEnemy(dt)
         {
             Visitor = _visitor,
             Velocity = Vector3.forward,
             Position = new Vector3(0, 10, 0),
-            Tag = t_e.Player
+            ParticipantIndex = t_e.Player,
+            Gun = new LaserGun(dt)
+            {
+                Visitor = _visitor,
+                BulletIndex = t_e.Weapon,
+            }
         };
     }
 }

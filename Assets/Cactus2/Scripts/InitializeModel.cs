@@ -14,6 +14,6 @@ public class InitializeModel : MonoBehaviour
         if (!typeof(IEntity).IsAssignableFrom(modelT)) throw new ArgumentException("èäíËå^ÇÕé¿ç›ï®Ç≈ÇÕÇ†ÇËÇ‹ÇπÇÒÅB");
         var model = (IEntity)Activator.CreateInstance(modelT);
         //model.Visitor = visitor;
-        model.TrySetTag(Tag.GetOrCreate(tag));
+        model.TrySetTag(ParticipantIndex.GetOrCreate(tag));
     }
 }

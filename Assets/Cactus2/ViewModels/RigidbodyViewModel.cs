@@ -11,16 +11,23 @@ public class RigidbodyViewModel<TModel> : ViewModel<TModel> where TModel : class
     const float POS_ADJUSTMENT_PROMPTNESS = 3f;
     const float ROT_ADJUSTMENT_PROMPTNESS = 100.0f;
 
+    public bool lerp = true;
+
     [SerializeField]
     Rigidbody _rigidbody;
 
+    public bool UseGravity { get; protected set; }
+
+    protected void OnEnable()
+    {
+        _rigidbody.position = Model.Position;
+        _rigidbody.rotation = Model.Rotation;
+    }
+
     protected void FixedUpdate()
     {
-        var ratio = 1 - Exp(-POS_ADJUSTMENT_PROMPTNESS * Time.deltaTime);
-        _rigidbody.position = vec.Lerp(_rigidbody.position, Model.Position, ratio);
-        ratio = 1 - Exp(-ROT_ADJUSTMENT_PROMPTNESS * Time.deltaTime);
-        _rigidbody.rotation = qtn.Lerp(_rigidbody.rotation, Model.Rotation, ratio);
-
+        _rigidbody.position = lerp ? vec.Lerp(Model.Position, _rigidbody.position, Exp(-POS_ADJUSTMENT_PROMPTNESS * Time.deltaTime)) : Model.Position;
+        _rigidbody.rotation = lerp ? qtn.Lerp(Model.Rotation, _rigidbody.rotation, Exp(-ROT_ADJUSTMENT_PROMPTNESS * Time.deltaTime)) : Model.Rotation;
         _rigidbody.velocity = Model.Velocity;
         _rigidbody.angularVelocity = Model.AngularVelocity;
         _rigidbody.mass = Model.Mass;

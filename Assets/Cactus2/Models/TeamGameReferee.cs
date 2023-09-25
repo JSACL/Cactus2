@@ -5,18 +5,18 @@ using TMPro.EditorUtilities;
 
 public class TeamGameReferee : IReferee 
 {
-    readonly CorrespondenceTable<Tag, Team> _teams;
-    readonly CorrespondenceTable<Tag, List<ITagged>> _members;
+    readonly CorrespondenceTable<ParticipantIndex, Team> _teams;
+    readonly CorrespondenceTable<ParticipantIndex, List<IParticipant>> _members;
 
     public TeamGameReferee()
     {
-        _teams = new(Tag.Context);
-        _members = new(Tag.Context);
+        _teams = new(ParticipantIndex.Context);
+        _members = new(ParticipantIndex.Context);
     }
 
-    public Team GetTeam(Tag tag) => _teams[tag] ?? throw new KeyNotFoundException();
+    public Team GetTeam(ParticipantIndex tag) => _teams[tag] ?? throw new KeyNotFoundException();
 
-    public Judgement Judge(Tag offensiveSide, Tag defensiveSide)
+    public Judgement Judge(ParticipantIndex offensiveSide, ParticipantIndex defensiveSide)
     {
         if (_teams[offensiveSide] is not { } t_o) return Judgement.None;
         if (_teams[defensiveSide] is not { } t_d) return Judgement.None;
@@ -29,10 +29,10 @@ public class TeamGameReferee : IReferee
             (true, true) => Judgement.Error,
         };
     }
-    public Judgement Judge(ITagged offensiveSide, ITagged defensiveSide)
+    public Judgement Judge(IParticipant offensiveSide, IParticipant defensiveSide)
     {
-        if (_teams[offensiveSide.Tag] is not { } t_o) return Judgement.None;
-        if (_teams[defensiveSide.Tag] is not { } t_d) return Judgement.None;
+        if (_teams[offensiveSide.ParticipantIndex] is not { } t_o) return Judgement.None;
+        if (_teams[defensiveSide.ParticipantIndex] is not { } t_d) return Judgement.None;
 
         return (t_o.IsEnemy(with: t_d), t_o.IsFriend(with: t_d)) switch
         {
@@ -48,15 +48,15 @@ public class TeamGameReferee : IReferee
         readonly TeamGameReferee _referee;
         readonly Dictionary<Team?, TeamRelationShip> _relationships;
         string _name;
-        Tag? _player;
-        Tag? _weapon;
+        ParticipantIndex? _player;
+        ParticipantIndex? _weapon;
 
-        public Tag? Player
+        public ParticipantIndex? Player
         {
             get => _player;
             set => SetPI(ref _player, value);
         }
-        public Tag? Weapon
+        public ParticipantIndex? Weapon
         {
             get => _weapon;
             set => SetPI(ref _weapon, value);
@@ -95,7 +95,7 @@ public class TeamGameReferee : IReferee
         public bool IsEnemy(Team? with) => _relationships.TryGetValue(with, out var r) && r == TeamRelationShip.Enemy;
         public bool IsFriend(Team? with) => _relationships.TryGetValue(with, out var r) && r == TeamRelationShip.Friend;
 
-        void SetPI(ref Tag? field, Tag? value)
+        void SetPI(ref ParticipantIndex? field, ParticipantIndex? value)
         {
             if (field is { })
             {

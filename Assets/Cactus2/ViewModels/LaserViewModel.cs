@@ -37,7 +37,7 @@ public class LaserViewModel : ViewModel<ILaser>
 
     void Start()
     {
-        _bodyHOC.Tag = Model.Tag;
+        _bodyHOC.Participant = Model.ParticipantIndex;
 
         _bodyTES.Enter += (_, e) =>
         {

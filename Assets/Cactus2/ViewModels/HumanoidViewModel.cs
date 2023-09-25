@@ -8,8 +8,8 @@ using qtn = UnityEngine.Quaternion;
 
 public class HumanoidViewModel<TModel> : RigidbodyViewModel<TModel> where TModel : class, IHumanoid
 {
-    [SerializeField]
-    List<GroundComponent> _groundComponents = new();
+    readonly List<GroundComponent> _groundComponents = new();
+
     [SerializeField]
     Animator _animator = null!;
     [SerializeField]
@@ -34,16 +34,16 @@ public class HumanoidViewModel<TModel> : RigidbodyViewModel<TModel> where TModel
 
     protected void Start()
     {
-        _bodyTC.Tag = Model.Tag;
+        _bodyTC.ParticipantIndex = Model.ParticipantIndex;
 
         _footTES.Enter += (_, e) =>
         {
-            if (e.Other.GetComponent<GroundComponent>() is { } gC)
+            if (e.Other.GetComponentSC<GroundComponent>() is { } gC)
                 _groundComponents.Add(gC);
         };
         _footTES.Exit += (_, e) =>
         {
-            if (e.Other.GetComponent<GroundComponent>() is { } gC)
+            if (e.Other.GetComponentSC<GroundComponent>() is { } gC)
                 _groundComponents.Remove(gC);
         };
         _bodyCES.Stay += (_, e) =>

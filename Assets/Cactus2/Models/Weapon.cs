@@ -18,12 +18,12 @@ public abstract class Weapon : Entity, IWeapon
         }
     }
     public float CooldownTimeRemaining => _cooldownTimeRemaining;
+    public bool IsReadyToFire => CooldownTimeRemaining <= 0;
     public virtual float CooldownTime => 1f;
-    public TeamGameReferee.Team Team { get; set; }
+    public ParticipantIndex BulletIndex { get; set; } = ParticipantIndex.Unknown;
 
-    public Weapon(DateTime time, TeamGameReferee.Team team) : base(time)
+    public Weapon(DateTime time) : base(time)
     {
-        Team = team;
     }
 
     protected override void Update(float deltaTime)
@@ -36,13 +36,12 @@ public abstract class Weapon : Entity, IWeapon
 
     public void Trigger()
     {
-        if (CooldownTimeRemaining > 0) return;
+        if (!IsReadyToFire) return;
 
         _cooldownTimeRemaining = CooldownTime;
 
-        if (Team.Weapon is not { } weaponPI) throw new InvalidOperationException("Š‘®ƒ`[ƒ€‚É‚Í•Ší‚ª‘¶İ‚Å‚«‚Ü‚¹‚ñB");
-        Fire(weaponPI);
+        Fire(BulletIndex);
     }
 
-    protected abstract void Fire(Tag tag);
+    protected abstract void Fire(ParticipantIndex tag);
 }

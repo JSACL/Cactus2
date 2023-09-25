@@ -13,12 +13,11 @@ using vec = UnityEngine.Vector3;
 public class FugaEnemy : Animal, ISpecies1
 {
     public const float FORCE_REDUCTION_RATE_PER_SEC = 0.001f;
-
+    LaserGun? _gun;
     readonly Random _rand;
-    float _cooldownTime_rest;
-    float _charge_rest = 0;
-    Laser? _laserHavingFired;
-    readonly CachedCollection<Vector3> _targetCoordinates;
+    readonly CachedCollection<Vector3> _targetPositions;
+
+    public LaserGun? Gun { get => _gun; set => _gun = value; }
 
     public override IVisitor? Visitor
     {
@@ -30,15 +29,15 @@ public class FugaEnemy : Animal, ISpecies1
             _visitor?.Add(this);
         }
     }
-    public IEnumerable<Vector3> TargetCoordinates
+    public IEnumerable<Vector3> TargetPositions
     {
-        get => _targetCoordinates;
-        set => _targetCoordinates.InnerEnumerable = value;
+        get => _targetPositions;
+        set => _targetPositions.InnerEnumerable = value;
     }
 
     public FugaEnemy(DateTime time) : base(time)
     {
-        _targetCoordinates = new();
+        _targetPositions = new();
         _rand = new Random();
     }
 
@@ -46,37 +45,19 @@ public class FugaEnemy : Animal, ISpecies1
     {
         base.Update(deltaTime);
 
-        _cooldownTime_rest -= deltaTime;
-        if (_cooldownTime_rest < 0)
+        if (_gun is { })
         {
-            _cooldownTime_rest += 5;
-            _charge_rest += 0.1f;
-
-            _targetCoordinates.Update();
-            if (_targetCoordinates.Any())
+            _gun.Position = Position;
+            _gun.Rotation = Rotation;
+            if (_gun.IsReadyToFire)
             {
-                var v = _targetCoordinates[_rand.Next(_targetCoordinates.Count - 1)] - Position;
-                var v_n = v.normalized;
-                _laserHavingFired = new Laser(Time)
+                _targetPositions.Update();
+                if (_targetPositions.Any())
                 {
-                    Visitor = Visitor,
-                    Position = Position,
-                    Velocity = 100 * v_n,
-                    Tag = Tag,
-                    Rotation = Quaternion.LookRotation(v),
-                };
+                    _gun.TargetPosition = _targetPositions[_rand.Next(_targetPositions.Count - 1)];
+                    _gun.Trigger();
+                }
             }
-        }
-
-        if (_charge_rest < 0)
-        {
-            _laserHavingFired = null;
-        }
-
-        if (_laserHavingFired is not null)
-        {
-            _laserHavingFired.Length = (_laserHavingFired.Position - Position).magnitude;
-            _charge_rest -= 0.1f * deltaTime;
         }
     }
 }

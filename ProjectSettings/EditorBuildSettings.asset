@@ -14,5 +14,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Cactus2/Scenes/AnotherScene.unity
     guid: 1e943af2acb85824a974fb77d939bb55
+  - enabled: 1
+    path: Assets/Cactus2/Scenes/GeneratedScene.unity
+    guid: 109a35ab26647a64dad60f9db964f510
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 750d333a913f7954b8fc40bd380a011d, type: 2}

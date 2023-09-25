@@ -93,7 +93,7 @@ public class Entity : IEntity
             Update((float)dif.TotalSeconds);
         }
     }
-    public Tag Tag { get; set; } = Tag.Unknown;
+    public ParticipantIndex ParticipantIndex { get; set; } = ParticipantIndex.Unknown;
 
     public Entity(DateTime time)
     {
@@ -125,9 +125,9 @@ public class Entity : IEntity
 
     protected Vector3 GetLocalVelocity() => Quaternion.Inverse(Rotation) * Velocity;
 
-    public bool TrySetTag(Tag tag)
+    public bool TrySetTag(ParticipantIndex tag)
     {
-        Tag = tag;
+        ParticipantIndex = tag;
         return true;
     }
 }

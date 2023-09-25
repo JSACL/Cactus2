@@ -8,7 +8,7 @@ public static class Referee
         var tC_t = theother.GetComponentSC<TargetComponent>();
         if (hC_o != null && tC_t != null)
         {
-            var j = await IReferee.Current.JudgeAsync(hC_o.Tag, tC_t.Tag);
+            var j = await IReferee.Current.JudgeAsync(hC_o.Participant, tC_t.ParticipantIndex);
             if (j == Judgement.Valid)
             {
                 tC_t.InflictToHitPoint(hC_o.DamageForVitality);
@@ -23,12 +23,12 @@ public static class Referee
 
     }
 
-    public static Tag GetTargetTag(Tag tag)
+    public static ParticipantIndex GetTargetTag(ParticipantIndex tag)
     {
-        foreach (var i in Tag.Context.Indexes)
+        foreach (var i in ParticipantIndex.Context.Indexes)
         {
             if (IReferee.Current.Judge(tag, i) == Judgement.Valid) return i;
         }
-        return Tag.Unknown;
+        return ParticipantIndex.Unknown;
     }
 }

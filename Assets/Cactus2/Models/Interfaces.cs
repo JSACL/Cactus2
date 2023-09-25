@@ -7,12 +7,12 @@ using UnityEngine;
 
 public interface IReferee
 {
-    Judgement Judge(Tag offensiveSide, Tag defensiveSide);
-    Task<Judgement> JudgeAsync(Tag offensiveSide, Tag defensiveSide) => Task.FromResult(Judge(offensiveSide, defensiveSide));
+    Judgement Judge(ParticipantIndex offensiveSide, ParticipantIndex defensiveSide);
+    Task<Judgement> JudgeAsync(ParticipantIndex offensiveSide, ParticipantIndex defensiveSide) => Task.FromResult(Judge(offensiveSide, defensiveSide));
     [Obsolete]
-    Judgement Judge(ITagged offensiveSide, ITagged defensiveSide);
+    Judgement Judge(IParticipant offensiveSide, IParticipant defensiveSide);
     [Obsolete]
-    Task<Judgement> JudgeAsync(ITagged offensiveSide, ITagged defensiveSide) => Task.FromResult(Judge(offensiveSide, defensiveSide));
+    Task<Judgement> JudgeAsync(IParticipant offensiveSide, IParticipant defensiveSide) => Task.FromResult(Judge(offensiveSide, defensiveSide));
 
     static IReferee Current { get; set; } = SuperiorReferee.Topmost;
 }
@@ -22,12 +22,12 @@ public interface IVisible
     IVisitor? Visitor { get; set; }
 }
 
-public interface ITagged
+public interface IParticipant
 {
-    Tag Tag => Tag.Unknown;
+    ParticipantIndex ParticipantIndex => ParticipantIndex.Unknown;
 }
 
-public interface IEntity : IVisible, ITagged
+public interface IEntity : IVisible, IParticipant
 {
     Vector3 Position { get; set; }
     Vector3 Velocity { get; }
@@ -43,7 +43,7 @@ public interface IEntity : IVisible, ITagged
     void AddTime(float deltaTime) => Time += TimeSpan.FromSeconds(deltaTime);
     void Impulse(Vector3 at, Vector3 impulse);
     // TODO; ŠÃ‚¦‚È‚«‚à‚·‚éBˆá”½‚Å‚Í‚È‚¢‚ªB
-    bool TrySetTag(Tag tag) => false;
+    bool TrySetTag(ParticipantIndex tag) => false;
 }
 
 public interface IItem
@@ -150,5 +150,5 @@ public interface IPlayer : IHumanoid
 
 public interface ISpecies1 : IAnimal
 {
-    IEnumerable<Vector3> TargetCoordinates { get; set; }
+    IEnumerable<Vector3> TargetPositions { get; set; }
 }

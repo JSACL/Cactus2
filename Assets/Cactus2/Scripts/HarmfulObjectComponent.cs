@@ -5,7 +5,7 @@ public class HarmfulObjectComponent : SCComponent
 {
     public EventHandler Hit;
 
-    public Tag Tag { get; set; } = Tag.Unknown;
+    public ParticipantIndex Participant { get; set; } = ParticipantIndex.Unknown;
     public float DamageForVitality { get; set; }
     public float DamageForResilience { get; set; }
 

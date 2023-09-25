@@ -17,8 +17,7 @@ using System.Collections;
 
 public class Species1ViewModel : RigidbodyViewModel<ISpecies1>
 {
-    DateTime _nextTimeToSearch;
-    TargetCoordinates _tC;
+    TargetPositions _tC;
 
     [Header("Internal")]
     [SerializeField]
@@ -39,9 +38,11 @@ public class Species1ViewModel : RigidbodyViewModel<ISpecies1>
         _footTES.Exit += (_, e) => { if (e.Other.gameObject.layer is LAYER_GROUND) _groundCount_onFoot--; };
         _bodyCES.Stay += (_, e) => { Model?.Impulse(Model.Position, e.Impulse); };
 
-        _targetComponent.Tag = Model.Tag;
+        _targetComponent.ParticipantIndex = Model.ParticipantIndex;
+        _targetComponent.HitPointInflicted += (_, e) => { Model.InflictOnVitality(e); };
+        _targetComponent.RepairPointInflicted += (_, e) => { Model.InflictOnResilience(e); };
 
-        Model.TargetCoordinates = _tC = new ConeTargetCoordinates(Model.Tag, 100, 80);
+        Model.TargetPositions = _tC = new OmnidirectionalTargetPositions(Model.ParticipantIndex);//, 100, 80);
     }
 
     protected new void Update()
