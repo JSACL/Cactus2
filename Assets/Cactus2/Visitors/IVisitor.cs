@@ -8,10 +8,12 @@ public interface IVisitor
     void Add(IPlayer model);
     void Add(IFirer model);
     void Add(ISpecies1 model);
+    void Add(IScene model);
     void Remove(IEntity model);
     void Remove(IBullet model);
     void Remove(ILaser model);
     void Remove(IPlayer model);
     void Remove(IFirer model);
     void Remove(ISpecies1 model);
+    void Remove(IScene model);
 }

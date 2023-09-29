@@ -8,13 +8,16 @@ public class LaserGun : Weapon
     Laser? _laserHavingFired;
     DateTime _timeToStop;
 
-    public LaserGun(DateTime time) : base(time)
-    {
-    }
-
     public Vector3 TargetPosition { get; set; }
     public TimeSpan Span => new(0, 0, 2);
     public override float CooldownTime => 5;
+
+    public LaserGun(IScene scene) : base(scene)
+    {
+    }
+
+    public override void Visit(IVisitor visitor) => visitor.Add(this);
+    public override void Forgo(IVisitor visitor) => visitor.Remove(this);
 
     protected override void Update(float deltaTime)
     {
@@ -33,18 +36,17 @@ public class LaserGun : Weapon
         }
     }
 
-    protected override void Fire(ParticipantIndex tag)
+    protected override void Fire(Authority tag)
     {
         var v = TargetPosition - Position;
         var v_n = v.normalized;
-        _laserHavingFired = new Laser(Time)
+        Scene.Add(_laserHavingFired = new Laser(Scene)
         {
             Position = Position,
             Velocity = 100 * v_n,
-            ParticipantIndex = tag,
+            Authority = tag,
             Rotation = Quaternion.LookRotation(v),
-            Visitor = Visitor,
-        };
+        });
         _timeToStop = Time + Span;
     }
 }

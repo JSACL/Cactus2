@@ -28,6 +28,11 @@ public class ViewModel<TModel> : MonoBehaviour where TModel : class
         }
     }
 
+    protected void Awake()
+    {
+        gameObject.SetActive(false);
+    }
+
     protected virtual void Connect() { }
     protected virtual void Disconnect() { }
 }

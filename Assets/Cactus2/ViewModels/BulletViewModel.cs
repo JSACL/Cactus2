@@ -6,8 +6,18 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using static Utils;
 
-public class BulletViewModel : ViewModel<IBullet>
+public class BulletViewModel : RigidbodyViewModel<IBullet>
 {
+    readonly HitCommand _hitCommand = new();
+
+    public Transform tf_collider;
+    public AudioClip clip_breakingSE;
+    public GameObject obj_hitEffect;
+    public AudioSource audioSource;
+    public EnterCommandComponent enC_body;
+    public TargetComponent tC_body;
+    public ColliderComponent col_body;
+
     [SerializeField]
     bool _adsorbOnApproaching;
     [SerializeField]
@@ -15,16 +25,6 @@ public class BulletViewModel : ViewModel<IBullet>
     bool _isAdsorbed;
     //[SerializeField]
     //GameObject _speaker;
-    [SerializeField]
-    AudioClip _breakingSE;
-    [SerializeField]
-    GameObject _hitEffect;
-    [SerializeField]
-    AudioSource _audioSource;
-    [SerializeField]
-    TriggerComponent _bodyTES;
-    [SerializeField]
-    HarmfulObjectComponent _bodyHOC;
 
     [Header("àÍíËãóó£Ç…ãﬂÇ√Ç¢ÇΩÇÁñ⁄ïWÇ…Ç≠Ç¡Ç¬Ç≠ÅBçÇë¨ÇÃçUåÇÇà¿íËÇ≥ÇπÇÈÅB")]
     public bool AttachTarget;
@@ -46,50 +46,39 @@ public class BulletViewModel : ViewModel<IBullet>
 
     void Start()
     {
-        _bodyTES.Enter += (_, e) =>
+        enC_body.Command = _hitCommand;
+        tC_body.Executed += (_, e) =>
         {
-            Referee.JudgeCollisionEnter(_bodyHOC.gameObject, e.Other.gameObject);
-        };
-        _bodyHOC.Hit += (sender, e) =>
-        {
-            ShowEffect(sender, e);
+            e.Command.Execute(Model);
         };
     }
 
-    void OnEnable()
+    new protected void OnEnable()
     {
+        base.OnEnable();
+
+        _hitCommand.Authority = Model.Authority;
+        _hitCommand.DamageForResilience = 0.002f;
+        _hitCommand.DamageForVitality = 0.001f;
+        _hitCommand.IsValid = true;
+
         _isAdsorbed = false;
-        _hitEffect.SetActive(false);
-        _bodyHOC.DamageForVitality = 0.1f;
-        _bodyHOC.DamageForResilience = 0.2f;
-        _bodyHOC.Participant = Model.ParticipantIndex;
+        obj_hitEffect.SetActive(false);
 
-        transform.position = Model.Position;
-        transform.rotation = Model.Rotation;
+        if (Model is null) return;
 
+        tf_collider.SetPositionAndRotation(Model.Position, Model.Rotation);
         //if (_speaker != null)
         //{
         //    _speaker.transform.position = transform.position;
         //}
     }
 
-    void Update()
-    {
-        Assert(Model is not null);
-
-        Model.AddTime(Time.deltaTime);
-
-        if (Model is null) return;
-
-        transform.position = Model.Position;
-        transform.rotation = Model.Rotation;
-    }
-
     void ShowEffect(object? sender, EventArgs e)
     {
-        _hitEffect.transform.position = this.transform.position;
-        _hitEffect.SetActive(true);
-        _audioSource.transform.position = this.transform.position;
-        _audioSource.PlayOneShot(_breakingSE);
+        obj_hitEffect.transform.position = transform.position;
+        obj_hitEffect.SetActive(true);
+        audioSource.transform.position = transform.position;
+        audioSource.PlayOneShot(clip_breakingSE);
     }
 }

@@ -396,9 +396,11 @@ GameObject:
   - component: {fileID: 3274717702096737106}
   - component: {fileID: 3274717702096737110}
   - component: {fileID: 708993827031191960}
-  - component: {fileID: 820902882560122618}
+  - component: {fileID: 4824231805834809694}
+  - component: {fileID: 8270192885305743924}
+  - component: {fileID: 8817953917731332714}
   m_Layer: 23
-  m_Name: Bullet
+  m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -511,7 +513,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec541988d8f2a724a931873627585f3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &820902882560122618
+--- !u!114 &4824231805834809694
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -520,7 +522,31 @@ MonoBehaviour:
   m_GameObject: {fileID: 3274717702096737104}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8803d623abc396347b542ab868689620, type: 3}
+  m_Script: {fileID: 11500000, guid: 1022747b70b80884fb553387bd927acc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8270192885305743924
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3274717702096737104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 484dc1e4f35ec884780bb395c78d8b81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8817953917731332714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3274717702096737104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36ae9e861df1a224d8200d01f20f8974, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &8122715379943040534
@@ -539,7 +565,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2629716464790263485
 Transform:
   m_ObjectHideFlags: 0
@@ -570,13 +596,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5838a89d69157a54ca345cb2e0392838, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lerp: 1
+  _rigidbody: {fileID: 3274717702096737110}
+  tf_collider: {fileID: 3274717702096737109}
+  clip_breakingSE: {fileID: 8300000, guid: c8842a9feb9dda94abc70ca64be00d3a, type: 3}
+  obj_hitEffect: {fileID: 3274717701519755602}
+  audioSource: {fileID: 3274717701293412765}
+  enC_body: {fileID: 4824231805834809694}
+  tC_body: {fileID: 8270192885305743924}
+  col_body: {fileID: 8817953917731332714}
   _adsorbOnApproaching: 0
   _thresholdDistance_absorption: 0
-  _breakingSE: {fileID: 8300000, guid: c8842a9feb9dda94abc70ca64be00d3a, type: 3}
-  _hitEffect: {fileID: 3274717701519755602}
-  _audioSource: {fileID: 3274717701293412765}
-  _bodyTES: {fileID: 708993827031191960}
-  _bodyHOC: {fileID: 820902882560122618}
   AttachTarget: 0
   AttachDistance: 0
   Attached: 0

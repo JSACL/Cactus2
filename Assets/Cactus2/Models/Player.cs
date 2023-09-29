@@ -15,16 +15,6 @@ public class Player : Humanoid, IPlayer
     int _itemNumber;
     readonly List<IItem> _items;
 
-    public override IVisitor? Visitor
-    {
-        get => base.Visitor;
-        set
-        {
-            _visitor?.Remove(this);
-            _visitor = value;
-            _visitor?.Add(this);
-        }
-    }
     public int SelectedItemIndex
     {
         get => _itemNumber;
@@ -36,10 +26,12 @@ public class Player : Humanoid, IPlayer
     public IList<IItem> Items => _items;
     IReadOnlyList<IItem> IPlayer.Items => _items;
 
-    public Player(DateTime time) : base(time)
+    public Player(IScene scene) : base(scene)
     {
         _items = new();
     }
+    public override void Visit(IVisitor visitor) => visitor.Add(this);
+    public override void Forgo(IVisitor visitor) => visitor.Remove(this);
 
     public void Fire(float timeSpan)
     {

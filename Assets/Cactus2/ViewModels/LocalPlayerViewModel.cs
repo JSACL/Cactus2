@@ -14,8 +14,7 @@ using System.Collections.Generic;
 
 public class LocalPlayerViewModel : HumanoidViewModel<IPlayer>
 {
-    [SerializeField]
-    Camera _camera = null!;
+    public new Camera camera;
 
     protected new void Start()
     {

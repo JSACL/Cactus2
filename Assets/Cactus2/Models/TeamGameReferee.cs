@@ -5,18 +5,18 @@ using TMPro.EditorUtilities;
 
 public class TeamGameReferee : IReferee 
 {
-    readonly CorrespondenceTable<ParticipantIndex, Team> _teams;
-    readonly CorrespondenceTable<ParticipantIndex, List<IParticipant>> _members;
+    readonly CorrespondenceTable<Authority, Team> _teams;
+    readonly CorrespondenceTable<Authority, List<IAuthorized>> _members;
 
     public TeamGameReferee()
     {
-        _teams = new(ParticipantIndex.Context);
-        _members = new(ParticipantIndex.Context);
+        _teams = new(Authority.Context);
+        _members = new(Authority.Context);
     }
 
-    public Team GetTeam(ParticipantIndex tag) => _teams[tag] ?? throw new KeyNotFoundException();
+    public Team GetTeam(Authority tag) => _teams[tag] ?? throw new KeyNotFoundException();
 
-    public Judgement Judge(ParticipantIndex offensiveSide, ParticipantIndex defensiveSide)
+    public Judgement Judge(Authority offensiveSide, Authority defensiveSide)
     {
         if (_teams[offensiveSide] is not { } t_o) return Judgement.None;
         if (_teams[defensiveSide] is not { } t_d) return Judgement.None;
@@ -29,10 +29,10 @@ public class TeamGameReferee : IReferee
             (true, true) => Judgement.Error,
         };
     }
-    public Judgement Judge(IParticipant offensiveSide, IParticipant defensiveSide)
+    public Judgement Judge(IAuthorized offensiveSide, IAuthorized defensiveSide)
     {
-        if (_teams[offensiveSide.ParticipantIndex] is not { } t_o) return Judgement.None;
-        if (_teams[defensiveSide.ParticipantIndex] is not { } t_d) return Judgement.None;
+        if (_teams[offensiveSide.Authority] is not { } t_o) return Judgement.None;
+        if (_teams[defensiveSide.Authority] is not { } t_d) return Judgement.None;
 
         return (t_o.IsEnemy(with: t_d), t_o.IsFriend(with: t_d)) switch
         {
@@ -48,15 +48,15 @@ public class TeamGameReferee : IReferee
         readonly TeamGameReferee _referee;
         readonly Dictionary<Team?, TeamRelationShip> _relationships;
         string _name;
-        ParticipantIndex? _player;
-        ParticipantIndex? _weapon;
+        Authority? _player;
+        Authority? _weapon;
 
-        public ParticipantIndex? Player
+        public Authority? Player
         {
             get => _player;
             set => SetPI(ref _player, value);
         }
-        public ParticipantIndex? Weapon
+        public Authority? Weapon
         {
             get => _weapon;
             set => SetPI(ref _weapon, value);
@@ -95,7 +95,7 @@ public class TeamGameReferee : IReferee
         public bool IsEnemy(Team? with) => _relationships.TryGetValue(with, out var r) && r == TeamRelationShip.Enemy;
         public bool IsFriend(Team? with) => _relationships.TryGetValue(with, out var r) && r == TeamRelationShip.Friend;
 
-        void SetPI(ref ParticipantIndex? field, ParticipantIndex? value)
+        void SetPI(ref Authority? field, Authority? value)
         {
             if (field is { })
             {

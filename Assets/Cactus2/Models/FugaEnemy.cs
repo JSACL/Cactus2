@@ -19,27 +19,20 @@ public class FugaEnemy : Animal, ISpecies1
 
     public LaserGun? Gun { get => _gun; set => _gun = value; }
 
-    public override IVisitor? Visitor
-    {
-        get => base.Visitor;
-        set
-        {
-            _visitor?.Remove(this);
-            _visitor = value;
-            _visitor?.Add(this);
-        }
-    }
     public IEnumerable<Vector3> TargetPositions
     {
         get => _targetPositions;
         set => _targetPositions.InnerEnumerable = value;
     }
 
-    public FugaEnemy(DateTime time) : base(time)
+    public FugaEnemy(IScene scene) : base(scene)
     {
         _targetPositions = new();
         _rand = new Random();
     }
+
+    public override void Visit(IVisitor visitor) => visitor.Add(this);
+    public override void Forgo(IVisitor visitor) => visitor.Remove(this);
 
     protected override void Update(float deltaTime)
     {

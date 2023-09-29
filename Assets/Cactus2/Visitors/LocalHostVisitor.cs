@@ -21,10 +21,11 @@ public class LocalHostVisitor : IVisitor
     readonly SingleViewModels<ILaser> _lasers = new();
     readonly SingleViewModels<IEntity> _entities = new();
     readonly SingleViewModels<ISpecies1> _species1s = new();
+    readonly SingleViewModels<IScene> _scenes = new();
 
-    public Scene Scene { get; }
+    public UnityEngine.SceneManagement.Scene Scene { get; }
 
-    public LocalHostVisitor(Scene scene)
+    public LocalHostVisitor(UnityEngine.SceneManagement.Scene scene)
     {
         Scene = scene;
 
@@ -34,6 +35,7 @@ public class LocalHostVisitor : IVisitor
         _lasers.GameObjectSource = new GameObjectSource(P("Laser"), Scene);
         _entities.GameObjectSource = new GameObjectSource(P("Entity"), Scene);
         _species1s.GameObjectSource = new GameObjectSource(P("Species1"), Scene);
+        _scenes.GameObjectSource = new GameObjectSource(P("SceneUI"), Scene);
 
         static string P(string name) => $"Assets/Cactus2/Views/{name}.prefab";
     }
@@ -55,6 +57,9 @@ public class LocalHostVisitor : IVisitor
 
     public void Add(ISpecies1 model) => _species1s.Add(model);
     public void Remove(ISpecies1 model) => _species1s.Remove(model);
+
+    public void Add(IScene model) => _scenes.Add(model);
+    public void Remove(IScene model) => _scenes.Remove(model);
 }
 
 public class SingleViewModels<TModel> : ICollection<TModel> where TModel : class

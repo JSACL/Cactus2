@@ -4,20 +4,19 @@ using UnityEngine;
 
 public class FugaFirer : Weapon, IFirer
 {
-    public FugaFirer(DateTime time) : base(time)
+    public FugaFirer(IScene scene) : base(scene)
     {
 
     }
 
-    protected override void Fire(ParticipantIndex tag)
+    protected override void Fire(Authority tag)
     {
-        var b = new Bullet(Time)
+        Scene.Add(new Bullet(Scene)
         {
-            ParticipantIndex = tag,
+            Authority = tag,
             Rotation = Rotation,
             Position = Position,
             Velocity = Rotation * (20 * Vector3.forward),
-            Visitor = Visitor
-        };
+        });
     }
 }

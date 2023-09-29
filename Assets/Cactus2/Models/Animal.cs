@@ -11,16 +11,6 @@ public class Animal : Entity, IAnimal
     float _vitality;
     float _resilience;
 
-    public override IVisitor? Visitor 
-    { 
-        get => base.Visitor; 
-        set 
-        {
-            _visitor?.Remove(this);
-            _visitor = value;
-            _visitor?.Add(this);
-        } 
-    }
     public float RepairPromptness { get; } = 0.2f;
     public float ResilienceRecoveryDelay { get; } = 1;
     public float RepairA { get; } = 0.1f;
@@ -30,10 +20,13 @@ public class Animal : Entity, IAnimal
     public event AnimationTransitionEventHandler? TransitBodyAnimation;
     public event EventHandler? Died;
 
-    public Animal(DateTime time) : base(time)
+    public Animal(IScene scene) : base(scene)
     {
 
     }
+
+    public override void Visit(IVisitor visitor) => visitor.Add(this);
+    public override void Forgo(IVisitor visitor) => visitor.Remove(this);
 
     protected void OnTransitBodyAnimation(AnimationTransitionEventArgs e) => TransitBodyAnimation?.Invoke(this, e);
 

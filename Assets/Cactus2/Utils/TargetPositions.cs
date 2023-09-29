@@ -10,7 +10,7 @@ public abstract class TargetPositions : IEnumerable<Vector3>
 
     Quaternion _rot_rec;
 
-    public ParticipantIndex Tag { get; set; }
+    public string Tag { get; set; }
     public Vector3 EyePoint { get; set; }
     public Quaternion EyeRotation
     {
@@ -18,7 +18,7 @@ public abstract class TargetPositions : IEnumerable<Vector3>
         set => _rot_rec= Quaternion.Inverse(value);
     }
 
-    public TargetPositions(ParticipantIndex tag)
+    public TargetPositions(string tag)
     {
         _pool = new(this);
 
@@ -34,7 +34,7 @@ public abstract class TargetPositions : IEnumerable<Vector3>
     {
         readonly TargetPositions _p;
 
-        IEnumerator<TargetComponent> _etor;
+        IEnumerator<GameObject> _etor;
         Vector3 _c;
 
         public Enumerator(TargetPositions p)
@@ -67,7 +67,7 @@ public abstract class TargetPositions : IEnumerable<Vector3>
         }
         public void Reset()
         {
-            _etor = TargetComponent.Enableds(with: Referee.GetTargetTag(_p.Tag)).GetEnumerator();
+            _etor = ((IEnumerable<GameObject>)GameObject.FindGameObjectsWithTag(_p.Tag)).GetEnumerator(); //TargetComponent.Enableds(with: Referee.GetTargetTag(_p.Tag)).GetEnumerator();
         }
     }
 
@@ -88,7 +88,7 @@ public class OmnidirectionalTargetPositions : TargetPositions
 {
     protected override bool Filter(Vector3 p_local) => true;
 
-    public OmnidirectionalTargetPositions(ParticipantIndex tag) : base(tag) { }
+    public OmnidirectionalTargetPositions(string tag) : base(tag) { }
 }
 
 public class ConeTargetPositions : TargetPositions
@@ -101,7 +101,7 @@ public class ConeTargetPositions : TargetPositions
         set => _a_tan = Mathf.Tan(Angle);
     }
 
-    public ConeTargetPositions(ParticipantIndex tag, float maxDistance, float angle) : base(tag)
+    public ConeTargetPositions(string tag, float maxDistance, float angle) : base(tag)
     {
         Angle = angle;
     }

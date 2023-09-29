@@ -9,20 +9,15 @@ using static Utils;
 
 public class LaserViewModel : ViewModel<ILaser>
 {
-    [SerializeField]
-    Transform _headT;
-    [SerializeField]
-    Transform _colliderT;
-    [SerializeField]
-    AudioClip _breakingSE;
-    [SerializeField]
-    GameObject _hitEffect;
-    [SerializeField]
-    AudioSource _audioSource;
-    [SerializeField]
-    TriggerComponent _bodyTES;
-    [SerializeField]
-    HarmfulObjectComponent _bodyHOC;
+    readonly HitCommand _hitCommand = new();
+
+    public Transform tf_head;
+    public Transform tf_collider;
+    public AudioClip clip_breakingSE;
+    public GameObject obj_hitEffect;
+    public AudioSource audioSource;
+    public StayCommandComponent stC_body;
+    public TargetComponent tC_body;
 
     protected override void Connect()
     {
@@ -37,51 +32,47 @@ public class LaserViewModel : ViewModel<ILaser>
 
     void Start()
     {
-        _bodyTES.Enter += (_, e) =>
+        stC_body.Command = _hitCommand;
+        tC_body.Executed += (_, e) =>
         {
-            Referee.JudgeCollisionEnter(_bodyHOC.gameObject, e.Other.gameObject);
-        };
-        _bodyHOC.Hit += (sender, e) =>
-        {
-            ShowEffect(sender, e);
+            e.Command.Execute(Model);
         };
     }
 
-    void OnEnable()
+    protected void OnEnable()
     {
-        _hitEffect.SetActive(false);
-        _bodyHOC.Participant = Model.ParticipantIndex;
-        _bodyHOC.DamageForVitality = 0.2f;
-        _bodyHOC.DamageForResilience = 0.1f;
+        _hitCommand.Authority = Model.Authority;
+        _hitCommand.DamageForResilience = 0.002f;
+        _hitCommand.DamageForVitality = 0.001f;
+        _hitCommand.IsValid = true;
+
+        obj_hitEffect.SetActive(false);
 
         if (Model is null) return;
-        _headT.SetPositionAndRotation(Model.Position, Model.Rotation);
-        _colliderT.SetPositionAndRotation(Model.Position, Model.Rotation);
+        
+        tf_head.SetPositionAndRotation(Model.Position, Model.Rotation);
+        tf_collider.SetPositionAndRotation(Model.Position, Model.Rotation);
         //if (_speaker != null)
         //{
         //    _speaker.transform.position = transform.position;
         //}
     }
 
-    void Update()
+    protected void Update()
     {
-        Assert(Model is not null);
-
-        Model.AddTime(Time.deltaTime);
-
         if (Model is null) return;
 
-        _headT.SetPositionAndRotation(Model.Position, Model.Rotation);
+        tf_head.SetPositionAndRotation(Model.Position, Model.Rotation);
         var mid = Model.Position - 0.5f * Model.Length * (Model.Rotation * Vector3.forward);
-        _colliderT.SetPositionAndRotation(mid, Model.Rotation);
-        _colliderT.localScale = new(1, 1, Model.Length);
+        tf_collider.SetPositionAndRotation(mid, Model.Rotation);
+        tf_collider.localScale = new(1, 1, Model.Length);
     }
 
     void ShowEffect(object? sender, EventArgs e)
     {
-        _hitEffect.transform.position = _headT.transform.position;
-        _hitEffect.SetActive(true);
-        _audioSource.transform.position = _headT.transform.position;
-        _audioSource.PlayOneShot(_breakingSE);
+        obj_hitEffect.transform.position = tf_head.transform.position;
+        obj_hitEffect.SetActive(true);
+        audioSource.transform.position = tf_head.transform.position;
+        audioSource.PlayOneShot(clip_breakingSE);
     }
 }

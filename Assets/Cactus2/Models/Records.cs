@@ -116,3 +116,11 @@ public readonly struct CollectionChangeEventArgs
 }
 
 public delegate void CollectionChangeEventHandler(object? sender, CollectionChangeEventArgs e);
+
+public readonly struct CommandEventArgs
+{
+    public ICommand Command { get; }
+    public CommandEventArgs(ICommand command) => Command = command;
+}
+
+public delegate void CommandEventHandler(object? sender, CommandEventArgs e);

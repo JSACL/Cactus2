@@ -6,25 +6,18 @@ using static UnityEngine.GraphicsBuffer;
 
 public class Laser : Entity, ILaser
 {
-    public override IVisitor? Visitor
-    {
-        get => base.Visitor;
-        set
-        {
-            _visitor?.Remove(this);
-            _visitor = value;
-            _visitor?.Add(this);
-        }
-    }
     public float DamageForVitality { get; } = 0.2f;
     public float DamageForResilience { get; } = 0.1f;
     public float Length { set;  get; }
     public float Strength { private set; get; } = 200;
     public event EventHandler? ShowEffect;
 
-    public Laser(DateTime time) : base(time)
+    public Laser(IScene scene) : base(scene)
     {
     }
+
+    public override void Visit(IVisitor visitor) => visitor.Add(this);
+    public override void Forgo(IVisitor visitor) => visitor.Remove(this);
 
     public async void Hit()
     {
@@ -32,7 +25,7 @@ public class Laser : Entity, ILaser
         //Visitor = null;
 
         await Task.Delay(100);
-        Visitor = null;
+        Scene.Remove(this);
     }
 
     protected override void Update(float deltaTime)
@@ -40,6 +33,6 @@ public class Laser : Entity, ILaser
         base.Update(deltaTime);
 
         Strength -= 10 * deltaTime;
-        if (Strength <= 0) Visitor = null;
+        if (Strength <= 0) Scene.Remove(this);
     }
 }

@@ -53,14 +53,14 @@ public class GameObjectPool : ObjectPool<GameObject>
 {
     public GameObject Prefab { get; }
     public Transform Parent { get; }
-    public Scene? Scene { get; }
+    public UE.SceneManagement.Scene? Scene { get; }
 
     public GameObjectPool(GameObject prefab, Transform parent)
     {
         Prefab = prefab;
         Parent = parent;
     }
-    public GameObjectPool(GameObject prefab, Scene scene)
+    public GameObjectPool(GameObject prefab, UE.SceneManagement.Scene scene)
     {
         Prefab = prefab;
         Scene = scene;
@@ -78,7 +78,7 @@ public class GameObjectPool : ObjectPool<GameObject>
 public class LazyGameObjectPool : ObjectPool<GameObject>
 {
     readonly Transform _parent;
-    readonly Scene? _scene;
+    readonly UE.SceneManagement.Scene? _scene;
     readonly AssetReference _reference;
     GameObject _prefab;
     int _count;
@@ -89,7 +89,7 @@ public class LazyGameObjectPool : ObjectPool<GameObject>
         _reference = reference;
         _parent = parent;
     }
-    public LazyGameObjectPool(AssetReference reference, Scene scene)
+    public LazyGameObjectPool(AssetReference reference, UE.SceneManagement.Scene scene)
     {
         _reference = reference;
         _scene = scene;

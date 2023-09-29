@@ -34,15 +34,13 @@ public class Species1ViewModel : RigidbodyViewModel<ISpecies1>
 
     void Start()
     {
-        _footTES.Enter += (_, e) => { if (e.Other.gameObject.layer is LAYER_GROUND) _groundCount_onFoot++; };
-        _footTES.Exit += (_, e) => { if (e.Other.gameObject.layer is LAYER_GROUND) _groundCount_onFoot--; };
         _bodyCES.Stay += (_, e) => { Model?.Impulse(Model.Position, e.Impulse); };
+        _targetComponent.Executed += (_, e) =>
+        {
+            e.Command.Execute(Model);
+        };
 
-        _targetComponent.ParticipantIndex = Model.ParticipantIndex;
-        _targetComponent.HitPointInflicted += (_, e) => { Model.InflictOnVitality(e); };
-        _targetComponent.RepairPointInflicted += (_, e) => { Model.InflictOnResilience(e); };
-
-        Model.TargetPositions = _tC = new OmnidirectionalTargetPositions(Model.ParticipantIndex);//, 100, 80);
+        Model.TargetPositions = _tC = new OmnidirectionalTargetPositions(Model.Authority.Name);//, 100, 80);
     }
 
     protected new void Update()

@@ -7,24 +7,17 @@ public abstract class Weapon : Entity, IWeapon
 {
     float _cooldownTimeRemaining;
 
-    public override IVisitor? Visitor
-    {
-        get => base.Visitor;
-        set
-        {
-            _visitor?.Remove(this);
-            _visitor = value;
-            _visitor?.Add(this);
-        }
-    }
     public float CooldownTimeRemaining => _cooldownTimeRemaining;
     public bool IsReadyToFire => CooldownTimeRemaining <= 0;
     public virtual float CooldownTime => 1f;
-    public ParticipantIndex BulletIndex { get; set; } = ParticipantIndex.Unknown;
+    public Authority BulletIndex { get; set; } = Authority.Unknown;
 
-    public Weapon(DateTime time) : base(time)
+    public Weapon(IScene scene) : base(scene)
     {
     }
+
+    public override void Visit(IVisitor visitor) => visitor.Add(this);
+    public override void Forgo(IVisitor visitor) => visitor.Remove(this);
 
     protected override void Update(float deltaTime)
     {
@@ -43,5 +36,5 @@ public abstract class Weapon : Entity, IWeapon
         Fire(BulletIndex);
     }
 
-    protected abstract void Fire(ParticipantIndex tag);
+    protected abstract void Fire(Authority tag);
 }

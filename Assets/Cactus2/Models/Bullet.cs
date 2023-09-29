@@ -8,16 +8,6 @@ public class Bullet : Entity, IBullet
 {
     readonly DateTime _due;
 
-    public override IVisitor? Visitor
-    {
-        get => base.Visitor;
-        set
-        {
-            _visitor?.Remove(this);
-            _visitor = value;
-            _visitor?.Add(this);
-        }
-    }
     public float DamageForVitality { get; }
     public float DamageForResilience { get; }
     public bool VanishOnHit { get; }
@@ -27,12 +17,15 @@ public class Bullet : Entity, IBullet
     public event EventHandler? ShowEffect;
     //public Tag Tag { get; }
 
-    public Bullet(DateTime time) : base(time)
+    public Bullet(IScene scene) : base(scene)
     {
-        _due = time + new TimeSpan(0, 0, 20);
+        _due = Time + new TimeSpan(0, 0, 20);
 
-        ParticipantIndex = ParticipantIndex.Unknown;
+        Authority = Authority.Unknown;
     }
+
+    public override void Visit(IVisitor visitor) => visitor.Add(this);
+    public override void Forgo(IVisitor visitor) => visitor.Remove(this);
 
     public async void Hit()
     {
@@ -40,7 +33,7 @@ public class Bullet : Entity, IBullet
         //Visitor = null;
 
         await Task.Delay(100);
-        Visitor = null;
+        Scene.Remove(this);
     }
 
     protected override void Update(float deltaTime)
@@ -49,7 +42,7 @@ public class Bullet : Entity, IBullet
 
         Track(deltaTime);
 
-        if (Time > _due) Visitor = null;
+        if (Time > _due) Scene.Remove(this);
     }
 
     protected void Track(float deltaTime)

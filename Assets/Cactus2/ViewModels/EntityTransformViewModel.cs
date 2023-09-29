@@ -3,22 +3,25 @@ using static Utils;
 
 public class EntityTransformViewModel : ViewModel<IEntity>
 {
-    [SerializeField]
-    bool _isAggressive = false;
+    public bool match;
+    public bool stop;
 
     private void Update()
     {
-        Assert(Model is not null);
-
-        if (_isAggressive)
+        if (match)
         {
-            Model.Position = transform.position;
-            Model.Rotation = transform.rotation;
-            if (Model is Entity e) 
-            { 
-                e.Velocity = Vector3.zero; 
+            if (stop && Model is Entity e)
+            {
+                e.Velocity = Vector3.zero;
                 e.AngularVelocity = Vector3.zero;
             }
+            else
+            {
+                transform.position += Time.deltaTime * Model.Velocity;
+                transform.Rotate(Time.deltaTime * Model.AngularVelocity);
+            }
+            Model.Position = transform.position;
+            Model.Rotation = transform.rotation;
         }
         else
         {

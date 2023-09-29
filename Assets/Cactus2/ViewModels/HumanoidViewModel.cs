@@ -8,18 +8,11 @@ using qtn = UnityEngine.Quaternion;
 
 public class HumanoidViewModel<TModel> : RigidbodyViewModel<TModel> where TModel : class, IHumanoid
 {
-    readonly List<GroundComponent> _groundComponents = new();
-
-    [SerializeField]
-    Animator _animator = null!;
-    [SerializeField]
-    Transform _eyeT = null!;
-    [SerializeField]
-    ColliderComponent _bodyCES = null!;
-    [SerializeField]
-    TriggerComponent _footTES = null!;
-    [SerializeField]
-    TargetComponent _bodyTC = null!;
+    public Animator animator_body;
+    public Transform transform_eye;
+    public ColliderComponent collider_body;
+    public TargetComponent target_body;
+    public TargetComponent target_foot;
 
     protected override void Connect()
     {
@@ -34,29 +27,17 @@ public class HumanoidViewModel<TModel> : RigidbodyViewModel<TModel> where TModel
 
     protected void Start()
     {
-        _bodyTC.ParticipantIndex = Model.ParticipantIndex;
-
-        _footTES.Enter += (_, e) =>
+        target_foot.Executed += (_, e) =>
         {
-            if (e.Other.GetComponentSC<GroundComponent>() is { } gC)
-                _groundComponents.Add(gC);
+            e.Command.Execute(Model);
         };
-        _footTES.Exit += (_, e) =>
+        target_body.Executed += (_, e) =>
         {
-            if (e.Other.GetComponentSC<GroundComponent>() is { } gC)
-                _groundComponents.Remove(gC);
+            e.Command.Execute(Model);
         };
-        _bodyCES.Stay += (_, e) =>
+        collider_body.Stay += (_, e) =>
         {
             Model.Impulse(Model.Position, e.Impulse);
-        };
-        _bodyTC.HitPointInflicted += (_, e) =>
-        {
-            Model.InflictOnVitality(e);
-        };
-        _bodyTC.RepairPointInflicted += (_, e) =>
-        {
-            Model.InflictOnResilience(e);
         };
     }
 
@@ -64,16 +45,15 @@ public class HumanoidViewModel<TModel> : RigidbodyViewModel<TModel> where TModel
     {
         base.Update();
 
-        Model.FootIsOn = _groundComponents.Count > 0;
         Model.Impulse(Model.Position, Time.deltaTime * Model.Mass * Physics.gravity);
 
-        _eyeT.localRotation = Model.HeadRotation;
+        transform_eye.localRotation = Model.HeadRotation;
     }
 
     void TransitBodyAnimation(object? sender, AnimationTransitionEventArgs e)
     {
-        Assert(_animator is not null);
+        Assert(animator_body is not null);
 
-        e.Apply(to: _animator);
+        e.Apply(to: animator_body);
     }
 }

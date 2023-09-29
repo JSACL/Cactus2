@@ -46,9 +46,9 @@ public class GameObjectSource : IObjectSource<GameObject>
     public int Count { get; private set; }
     public string Address { get; internal set; }
     public Transform? Parent { get; internal set; }
-    public Scene? Scene { get; internal set; }
+    public UE.SceneManagement.Scene? Scene { get; internal set; }
 
-    public GameObjectSource(string address, Scene scene)
+    public GameObjectSource(string address, UE.SceneManagement.Scene scene)
     {
         Address = address;
         Scene = scene;

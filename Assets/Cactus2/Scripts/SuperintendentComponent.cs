@@ -9,11 +9,15 @@ public class SuperintendentComponent : MonoBehaviour
 {
     public bool @break;
 
+    IScene _scene;
+    TeamGameReferee _referee;
     IVisitor _visitor;
 
     private void Start()
     {
         TaskScheduler.UnobservedTaskException += (sender, e) => Debug.LogError(e);
+
+        _scene = new Scene(DateTime.Now, _referee = new TeamGameReferee());
 
         var s_d = SceneManager.GetSceneByName("GeneratedScene");
 
@@ -25,6 +29,7 @@ public class SuperintendentComponent : MonoBehaviour
         //var v2 = new LocalHostVisitor(s_a);
 
         _visitor = v1;//new CompositeVisitor(v1);
+        _scene.Visit(v1);
 
         Init();
     }
@@ -41,16 +46,12 @@ public class SuperintendentComponent : MonoBehaviour
 
     void Init()
     {
-        var dt = DateTime.Now;
-        var r = default(TeamGameReferee);
-        IReferee.Current = r = new TeamGameReferee();
-
-        var t_f = new TeamGameReferee.Team(r, "friend")
+        var t_f = new TeamGameReferee.Team(_referee, "friend")
         {
             Player = new("friend"),
             Weapon = new("friend-weapon"),
         };
-        var t_e = new TeamGameReferee.Team(r, "enemy")
+        var t_e = new TeamGameReferee.Team(_referee, "enemy")
         {
             Player = new("enemy"),
             Weapon = new("enemy-weapon"),
@@ -58,26 +59,23 @@ public class SuperintendentComponent : MonoBehaviour
         t_f.Regard(t_e, @as: TeamRelationShip.Enemy);
         t_e.Regard(t_f, @as: TeamRelationShip.Enemy);
 
-        var p = new Player(dt)
+        var p = new Player(_scene)
         {
-            Visitor = _visitor,
-            ParticipantIndex = t_f.Player,
+            Authority = t_f.Player,
             Vitality = ConstantValues.PLAYER_VIGOR_STANDARD,
             Resilience = 1.0f,
         };
         p.Died += (sender, e) => { };
-        p.Items.Add(new FugaFirer(dt) { Visitor = _visitor, BulletIndex = t_f.Weapon });
-        p.Items.Add(new FugaFirer(dt) { Visitor = _visitor, BulletIndex = t_f.Weapon });
-        p.Items.Add(new FugaFirer(dt) { Visitor = _visitor, BulletIndex = t_f.Weapon });
-        var s = new FugaEnemy(dt)
+        p.Items.Add(new FugaFirer(_scene) { BulletIndex = t_f.Weapon });
+        p.Items.Add(new FugaFirer(_scene) { BulletIndex = t_f.Weapon });
+        p.Items.Add(new FugaFirer(_scene) { BulletIndex = t_f.Weapon });
+        var s = new FugaEnemy(_scene)
         {
-            Visitor = _visitor,
             Velocity = Vector3.forward,
             Position = new Vector3(0, 10, 0),
-            ParticipantIndex = t_e.Player,
-            Gun = new LaserGun(dt)
+            Authority = t_e.Player,
+            Gun = new LaserGun(_scene)
             {
-                Visitor = _visitor,
                 BulletIndex = t_e.Weapon,
             }
         };

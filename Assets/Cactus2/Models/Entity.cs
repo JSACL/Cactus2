@@ -5,10 +5,11 @@ using vec = UnityEngine.Vector3;
 using static System.MathF;
 using static Utils;
 using TMPro;
+using Unity.VisualScripting;
 
 public class Entity : IEntity
 {
-    protected IVisitor? _visitor;
+    protected IScene _scene;
     DateTime _time;
     float _mass;
     float _mass_rec;
@@ -18,14 +19,14 @@ public class Entity : IEntity
     vec _position;
 
     protected internal bool SkipVelocityApplication { get; set; }
-    public virtual IVisitor? Visitor
+    public virtual IScene Scene
     {
-        get => _visitor;
+        get => _scene;
         set
         {
-            _visitor?.Remove(this);
-            _visitor = value;
-            _visitor?.Add(this);
+            _scene.Remove(this);
+            _scene = value;
+            _scene.Add(this);
         }
     }
     public vec Position
@@ -77,7 +78,7 @@ public class Entity : IEntity
             _mass_rec = 1 / value;
         }
     }
-    public float Mass_rec
+    internal float Mass_rec
     {
         get => _mass_rec;
     }
@@ -93,11 +94,12 @@ public class Entity : IEntity
             Update((float)dif.TotalSeconds);
         }
     }
-    public ParticipantIndex ParticipantIndex { get; set; } = ParticipantIndex.Unknown;
+    public Authority Authority { get; set; } = Authority.Unknown;
 
-    public Entity(DateTime time)
+    public Entity(IScene scene)
     {
-        _time = time;
+        _time = scene.Time;
+        _scene = scene;
 
         Mass = 10;
         Rotation = Quaternion.identity;
@@ -125,9 +127,18 @@ public class Entity : IEntity
 
     protected Vector3 GetLocalVelocity() => Quaternion.Inverse(Rotation) * Velocity;
 
-    public bool TrySetTag(ParticipantIndex tag)
+   public bool TrySetTag(Authority tag)
     {
-        ParticipantIndex = tag;
+        Authority = tag;
         return true;
+    }
+
+    public virtual void Visit(IVisitor visitor)
+    {
+        visitor.Add(this);
+    }
+    public virtual void Forgo(IVisitor visitor)
+    {
+        visitor.Remove(this);
     }
 }

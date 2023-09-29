@@ -27,16 +27,6 @@ public class Humanoid : Animal, IHumanoid
     bool _footIsOn;
     vec _force_leg;
 
-    public override IVisitor? Visitor
-    {
-        get => base.Visitor;
-        set
-        {
-            _visitor?.Remove(this);
-            _visitor = value;
-            _visitor?.Add(this);
-        }
-    }
     public bool IsRunning { get; set; }
     public vec Force_leg
     {
@@ -71,10 +61,13 @@ public class Humanoid : Animal, IHumanoid
     public Quaternion HeadRotation { get; set; } = Quaternion.identity;
     public IEntity? Focus { get; set; }
 
-    public Humanoid(DateTime time) : base(time)
+    public Humanoid(IScene scene) : base(scene)
     {
 
     }
+
+    public override void Visit(IVisitor visitor) => visitor.Add(this);
+    public override void Forgo(IVisitor visitor) => visitor.Remove(this);
 
     public void Seek(vec direction_local)
     {
