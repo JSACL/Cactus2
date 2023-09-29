@@ -37,8 +37,6 @@ public class LaserViewModel : ViewModel<ILaser>
 
     void Start()
     {
-        _bodyHOC.Participant = Model.ParticipantIndex;
-
         _bodyTES.Enter += (_, e) =>
         {
             Referee.JudgeCollisionEnter(_bodyHOC.gameObject, e.Other.gameObject);
@@ -52,6 +50,9 @@ public class LaserViewModel : ViewModel<ILaser>
     void OnEnable()
     {
         _hitEffect.SetActive(false);
+        _bodyHOC.Participant = Model.ParticipantIndex;
+        _bodyHOC.DamageForVitality = 0.2f;
+        _bodyHOC.DamageForResilience = 0.1f;
 
         if (Model is null) return;
         _headT.SetPositionAndRotation(Model.Position, Model.Rotation);
@@ -78,9 +79,9 @@ public class LaserViewModel : ViewModel<ILaser>
 
     void ShowEffect(object? sender, EventArgs e)
     {
-        _hitEffect.transform.position = this.transform.position;
+        _hitEffect.transform.position = _headT.transform.position;
         _hitEffect.SetActive(true);
-        _audioSource.transform.position = this.transform.position;
+        _audioSource.transform.position = _headT.transform.position;
         _audioSource.PlayOneShot(_breakingSE);
     }
 }

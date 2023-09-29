@@ -60,6 +60,9 @@ public class BulletViewModel : ViewModel<IBullet>
     {
         _isAdsorbed = false;
         _hitEffect.SetActive(false);
+        _bodyHOC.DamageForVitality = 0.1f;
+        _bodyHOC.DamageForResilience = 0.2f;
+        _bodyHOC.Participant = Model.ParticipantIndex;
 
         transform.position = Model.Position;
         transform.rotation = Model.Rotation;

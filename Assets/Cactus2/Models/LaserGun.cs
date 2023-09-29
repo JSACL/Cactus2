@@ -39,11 +39,11 @@ public class LaserGun : Weapon
         var v_n = v.normalized;
         _laserHavingFired = new Laser(Time)
         {
-            Visitor = Visitor,
             Position = Position,
             Velocity = 100 * v_n,
-            ParticipantIndex = ParticipantIndex,
+            ParticipantIndex = tag,
             Rotation = Quaternion.LookRotation(v),
+            Visitor = Visitor,
         };
         _timeToStop = Time + Span;
     }

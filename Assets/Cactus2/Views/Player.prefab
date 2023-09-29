@@ -317,8 +317,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f25ad1dd8904904e8da9fa1d31dcd36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lerp: 1
   _rigidbody: {fileID: 7383471391506724327}
-  _groundComponents: []
   _animator: {fileID: 7383471390567338399}
   _eyeT: {fileID: 7383471390259734423}
   _bodyCES: {fileID: 7031856964354394825}
