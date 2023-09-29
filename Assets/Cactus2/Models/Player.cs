@@ -1,6 +1,9 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Unity.VisualScripting.Dependencies.NCalc;
 using UnityEngine;
 using static ConstantValues;
 using static UnityEngine.Input;
@@ -9,45 +12,41 @@ using vec = UnityEngine.Vector3;
 
 public class Player : Humanoid, IPlayer
 {
-    const int JUMP_DELAY_MS = 100;
-    const float STOP_PROMPTNESS = 600f;
-    const float MOVEMENT_PROMPTNESS = 180.0f;
-    const float STOP_PULL_UP_COEF = 0.2f;
+    int _itemNumber;
+    readonly List<IItem> _items;
 
-    public void Seek(vec direction_local)
+    public override IVisitor? Visitor
     {
-        var f = Force_leg;
-        switch (direction_local.z)
+        get => base.Visitor;
+        set
         {
-        case < 0.001f and > -0.001f:
-            var v = vec.Dot(Velocity, Rotation * vec.forward);
-            f.z = -STOP_PROMPTNESS * PullUp(STOP_PULL_UP_COEF * v);
-            break;
-        default:
-            f += direction_local.z * MOVEMENT_PROMPTNESS * vec.forward;
-            break;
+            _visitor?.Remove(this);
+            _visitor = value;
+            _visitor?.Add(this);
         }
-        switch (direction_local.x)
+    }
+    public int SelectedItemIndex
+    {
+        get => _itemNumber;
+        set
         {
-        case < 0.001f and > -0.001f:
-            var v = vec.Dot(Velocity, Rotation * vec.right);
-            f.x = -STOP_PROMPTNESS * PullUp(STOP_PULL_UP_COEF * v);
-            break;
-        default:
-            f += direction_local.x * MOVEMENT_PROMPTNESS * vec.right;
-            break;
+            _itemNumber = value % _items.Count;
         }
-        Force_leg = f;
+    }
+    public IList<IItem> Items => _items;
+    IReadOnlyList<IItem> IPlayer.Items => _items;
+
+    public Player(DateTime time) : base(time)
+    {
+        _items = new();
     }
 
-    public async void Jump(float strength)
+    public void Fire(float timeSpan)
     {
-        if (!FootIsOn) return;
-
-        OnTransitBodyAnimation(new(A_N_JUMP, true));
-
-        await Task.Delay(JUMP_DELAY_MS);
-        Impulse(Position, new(0, 40.0f, 0));
+        if (_items[SelectedItemIndex] is IWeapon weapon)
+        {
+            weapon.Trigger();
+        }
     }
 
     protected override void Update(float deltaTime)
@@ -93,6 +92,15 @@ public class Player : Humanoid, IPlayer
         //}
 
         base.Update(deltaTime);
+
+        foreach (var item in _items) 
+        {
+            // TODO: Ç±ÇÃèåèï™ÇÕë”ëƒÅB
+            if (item is not IEntity entity) continue;
+            entity.Position = Position + vec.up;
+            entity.Rotation = Rotation * HeadRotation;
+        }
+        //Items[SelectedItemIndex].Rotation = Rotation;
     }
 
     //protected override void Elapsed(object? sender, ElapsedEventArgs e)

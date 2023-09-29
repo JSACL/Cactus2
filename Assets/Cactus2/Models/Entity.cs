@@ -8,6 +8,7 @@ using TMPro;
 
 public class Entity : IEntity
 {
+    protected IVisitor? _visitor;
     DateTime _time;
     float _mass;
     float _mass_rec;
@@ -17,6 +18,16 @@ public class Entity : IEntity
     vec _position;
 
     protected internal bool SkipVelocityApplication { get; set; }
+    public virtual IVisitor? Visitor
+    {
+        get => _visitor;
+        set
+        {
+            _visitor?.Remove(this);
+            _visitor = value;
+            _visitor?.Add(this);
+        }
+    }
     public vec Position
     {
         get => _position;
@@ -82,9 +93,12 @@ public class Entity : IEntity
             Update((float)dif.TotalSeconds);
         }
     }
+    public ParticipantIndex ParticipantIndex { get; set; } = ParticipantIndex.Unknown;
 
-    public Entity()
+    public Entity(DateTime time)
     {
+        _time = time;
+
         Mass = 10;
         Rotation = Quaternion.identity;
     }
@@ -110,4 +124,10 @@ public class Entity : IEntity
     }
 
     protected Vector3 GetLocalVelocity() => Quaternion.Inverse(Rotation) * Velocity;
+
+    public bool TrySetTag(ParticipantIndex tag)
+    {
+        ParticipantIndex = tag;
+        return true;
+    }
 }

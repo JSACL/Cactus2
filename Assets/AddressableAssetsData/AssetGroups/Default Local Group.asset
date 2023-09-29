@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Default Local Group
+  m_EditorClassIdentifier: 
+  m_GroupName: Default Local Group
+  m_Data:
+    m_SerializedData: []
+  m_GUID: f3345a848187db9428be1cf2bad552fb
+  m_SerializeEntries:
+  - m_GUID: 702bb84508aef1948b7c43d406ed115a
+    m_Address: Assets/Cactus2/Views/Fire1.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 8a02af3003513b64693d1c3b03ee0a48
+    m_Address: Assets/Cactus2/Views/Laser.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 105811390d205c643bafa2ae79e79769
+    m_Address: Assets/Cactus2/Views/Plane.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 6be4d4000c2dbab4eb781050ca0cd596
+    m_Address: Assets/Cactus2/Views/Player.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 3f24174927ff54647942f49077e3a7c9
+    m_Address: Assets/Cactus2/Views/PlayerSub.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 6dd650a2a95ee9e419c6a0172d0a898f
+    m_Address: Assets/Cactus2/Views/Species1.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 1a2cd9c5d3a7b2e4787d5351a60ea49c
+    m_Address: Assets/Cactus2/Views/Entity.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 7aac8eed089933a4d918fc3f9d94fdd5
+    m_Address: Assets/Cactus2/Views/CombatUI.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 7d34c051924816246b99f35c55a0fbe0
+    m_Address: Assets/Cactus2/Views/Bullet.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 55191c0ef1bbd804fa5c13a54f60560c, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: ea332f8b8e1e9494cb777afb5fe5a459, type: 2}
+    - {fileID: 11400000, guid: 6328043fa3d57dd46835730f3557aa74, type: 2}

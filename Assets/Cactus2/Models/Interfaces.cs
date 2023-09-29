@@ -1,9 +1,33 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
 
-public interface IEntity
+public interface IReferee
+{
+    Judgement Judge(ParticipantIndex offensiveSide, ParticipantIndex defensiveSide);
+    Task<Judgement> JudgeAsync(ParticipantIndex offensiveSide, ParticipantIndex defensiveSide) => Task.FromResult(Judge(offensiveSide, defensiveSide));
+    [Obsolete]
+    Judgement Judge(IParticipant offensiveSide, IParticipant defensiveSide);
+    [Obsolete]
+    Task<Judgement> JudgeAsync(IParticipant offensiveSide, IParticipant defensiveSide) => Task.FromResult(Judge(offensiveSide, defensiveSide));
+
+    static IReferee Current { get; set; } = SuperiorReferee.Topmost;
+}
+
+public interface IVisible
+{
+    IVisitor? Visitor { get; set; }
+}
+
+public interface IParticipant
+{
+    ParticipantIndex ParticipantIndex => ParticipantIndex.Unknown;
+}
+
+public interface IEntity : IVisible, IParticipant
 {
     Vector3 Position { get; set; }
     Vector3 Velocity { get; }
@@ -18,9 +42,66 @@ public interface IEntity
     void Rotate(Quaternion rotation) => Rotation = rotation * Rotation;
     void AddTime(float deltaTime) => Time += TimeSpan.FromSeconds(deltaTime);
     void Impulse(Vector3 at, Vector3 impulse);
+    // TODO; ŠÃ‚¦‚È‚«‚à‚·‚éBˆá”½‚Å‚Í‚È‚¢‚ªB
+    bool TrySetTag(ParticipantIndex tag) => false;
 }
 
-public interface IAnimal : IEntity
+public interface IItem
+{
+    //void Use(object? user);
+}
+
+public interface IWeapon : IEntity, IItem
+{
+    float CooldownTimeRemaining { get; }
+    float CooldownTime { get; }
+
+    void Trigger();
+
+    //void IItem.Use(object? user) => Trigger(Referee.GetInfo(of: user));
+}
+
+public interface IFirer : IWeapon
+{
+}
+
+public interface IBullet : IEntity
+{
+    float DamageForVitality { get; }
+    float DamageForResilience { get; }
+
+    event EventHandler? ShowEffect;
+
+    void Hit();
+}
+
+public interface ILaser : IEntity
+{
+    float DamageForVitality { get; }
+    float DamageForResilience { get; }
+    float Length { get; }
+
+    event EventHandler? ShowEffect;
+
+    void Hit();
+}
+
+public interface IHoming : IEntity
+{
+    Vector3? TargetCoordinate { get; set; }
+}
+
+public interface IEphemeral
+{
+    float Vitality { get; }
+    float Resilience { get; }
+    event EventHandler? Died;
+
+    void InflictOnVitality(float damage);
+    void InflictOnResilience(float damage);
+}
+
+public interface IAnimal : IEntity, IEphemeral
 {
     event AnimationTransitionEventHandler? TransitBodyAnimation;
 }
@@ -30,14 +111,9 @@ public interface IHumanoid : IAnimal
     bool IsRunning { get; set; }
     bool FootIsOn { get; set; }
     Quaternion HeadRotation { get; set; }
+    IEntity? Focus { get; set; }
 
     void Turn(Vector3 to) => HeadRotation = Quaternion.Euler(to - Position);
-}
-
-public interface IPlayer : IHumanoid
-{
-    internal const float DEFAULT_MOUSE_SENSITIVILITY = 1f;
-
     void Seek(bool forward, bool backward, bool right, bool left, float strength)
     {
         var x = 0f;
@@ -52,16 +128,27 @@ public interface IPlayer : IHumanoid
     void Jump(float strength);
     void Turn(float horizontal, float vertical)
     {
-        //HeadRotation = Quaternion.AngleAxis(DEFAULT_MOUSE_SENSITIVILITY * horizontal, Vector3.up) * Quaternion.AngleAxis(DEFAULT_MOUSE_SENSITIVILITY * vertical, HeadRotation * Vector3.right) * HeadRotation;
-
         var a = HeadRotation.eulerAngles;
         if (a.x < 80 || a.x > 280 || (a.x <= 180 && vertical < 0) || (a.x >= 180 && vertical > 0))
-            HeadRotation = Quaternion.AngleAxis(DEFAULT_MOUSE_SENSITIVILITY * vertical, Vector3.left) * HeadRotation;
-        Rotate(DEFAULT_MOUSE_SENSITIVILITY * horizontal, Vector3.up);
+            HeadRotation = Quaternion.AngleAxis(vertical, Vector3.left) * HeadRotation;
+        Rotate(horizontal, Vector3.up);
     }
+}
+
+public interface IGround
+{
+
+}
+
+public interface IPlayer : IHumanoid
+{
+    int SelectedItemIndex { get; set; }
+    IReadOnlyList<IItem> Items { get; }
+
+    void Fire(float timeSpan);
 }
 
 public interface ISpecies1 : IAnimal
 {
-
+    IEnumerable<Vector3> TargetPositions { get; set; }
 }
