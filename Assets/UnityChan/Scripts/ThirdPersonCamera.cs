@@ -8,7 +8,9 @@ using System.Collections;
 
 namespace UnityChan
 {
-	public class ThirdPersonCamera : MonoBehaviour
+    using Transform = UnityEngine.Transform;
+
+    public class ThirdPersonCamera : MonoBehaviour
 	{
 		public float smooth = 3f;		// カメラモーションのスムーズ化用変数
 		Transform standardPos;			// the usual position for the camera, specified by a transform in the game

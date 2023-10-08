@@ -4,20 +4,35 @@ using UnityEngine;
 using static Utils;
 using static System.MathF;
 using vec = UnityEngine.Vector3;
+using UE = UnityEngine;
 
-public class EntityViewModel : ViewModel<IEntity>
+public class EntityViewModel : EntityViewModel<IEntityPresenter>
 {
-    protected void Update()
-    {
-        Assert(Model is { });
 
-        Model.AddTime(Time.deltaTime);
+}
+
+public class EntityViewModel<TModel> : ViewModel<TModel> where TModel : class, IEntityPresenter
+{
+    public new UE::Transform transform;
+
+    protected override void Connect()
+    {
+        base.Connect();
+        Model.PropertyChanged += Reflect;
+    }
+    protected override void Disconnect()
+    {
+        Model.PropertyChanged -= Reflect;
+        base.Disconnect();
     }
 
-    protected void LateUpdate()
+    protected virtual void Reflect()
     {
-        if (Model is null) return;
-
-        transform.SetPositionAndRotation(Model.Position, Model.Rotation);
+        transform.SetPositionAndRotation(Model.Transform.Position.ToUnityVector3(), Model.Transform.Rotation.ToUnityQuaternion());
     }
+
+    protected void FixedUpdate() => Model.Elapsed(1);
+
+    protected void Update() => Model.AddTime(Time.deltaTime);
+
 }

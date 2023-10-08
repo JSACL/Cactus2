@@ -1,11 +1,13 @@
 #nullable enable
 using System;
 using System.Diagnostics.CodeAnalysis;
+using Nonno.Assets;
 using UnityEngine;
 
-public class ViewModel<TModel> : MonoBehaviour where TModel : class
+public class ViewModel<TModel> : MonoBehaviour, IViewModel<TModel> where TModel : class
 {
     TModel? _model = null!;
+    //readonly IObjectSource<TModel> _source;
 
     [property: NotNull]
     public TModel? Model
@@ -28,6 +30,19 @@ public class ViewModel<TModel> : MonoBehaviour where TModel : class
         }
     }
 
+    object IViewModel.Model => Model;
+
+    //public ViewModel()
+    //{
+    //    _source = IObjectSource<TModel>.Default ?? throw new Exception("àÀë∂ê´ÇÃíçì¸Ç…é∏îsÇµÇ‹ÇµÇΩÅB");
+    //    _model = _source.Get();
+    //}
+
+    //protected void OnDestroy()
+    //{
+    //    _source.Release(Model);
+    //}
+
     protected void Awake()
     {
         gameObject.SetActive(false);
@@ -35,4 +50,14 @@ public class ViewModel<TModel> : MonoBehaviour where TModel : class
 
     protected virtual void Connect() { }
     protected virtual void Disconnect() { }
+}
+
+public interface IViewModel
+{
+    object Model { get; }
+}
+
+public interface IViewModel<in TModel> : IViewModel
+{
+    new TModel? Model { set; }
 }

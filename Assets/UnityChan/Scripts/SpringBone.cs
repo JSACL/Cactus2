@@ -13,7 +13,7 @@ using System.Collections;
 
 namespace UnityChan
 {
-	public class SpringBone : MonoBehaviour
+    public class SpringBone : MonoBehaviour
 	{
 		//次のボーン
 		public Transform child;

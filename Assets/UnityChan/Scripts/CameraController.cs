@@ -18,7 +18,7 @@ using System.Collections;
 
 namespace UnityChan
 {
-	enum MouseButtonDown
+    enum MouseButtonDown
 	{
 		MBD_LEFT = 0,
 		MBD_RIGHT,

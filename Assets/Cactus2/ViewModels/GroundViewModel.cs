@@ -1,23 +1,24 @@
 #nullable enable
+using Nonno.Assets;
 using UnityEngine;
 
 public class GroundViewModel : ViewModel<IGround>
 {
-    readonly StabilizationCommand _stbCommand;
-    readonly DestabilizationCommand _dtbCommand;
+    StabilizationEffect _stbCommand;
+    DestabilizationEffect _dtbCommand;
 
-    public EnterCommandComponent enc_body;
-    public ExitCommandComponent exc_body;
+    public EnterEffectComponent enc_body;
+    public ExitEffectComponent exc_body;
 
     private void Start()
     {
-        enc_body.Command = _stbCommand;
-        exc_body.Command = _dtbCommand;
+        enc_body.Effect = _stbCommand;
+        exc_body.Effect = _dtbCommand;
     }
 
     private void OnEnable()
     {
-        _stbCommand.Authority = Authority.Natural;
-        _dtbCommand.Authority = Authority.Natural;
+        _stbCommand = new() { Authority = Authority.Natural};
+        _dtbCommand = new() { Authority = Authority.Natural};
     }
 }

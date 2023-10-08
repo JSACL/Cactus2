@@ -1,13 +1,31 @@
-#nullable enable
-using static Utils;
-using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using TMPro;
+using UE = UnityEngine;
 
-public class WeaponViewModel : ViewModel<IFirer>
+public class WeaponViewModel : EntityViewModel<IWeaponPresenter>
 {
-    void Update()
-    {
-        Assert(Model is not null);
+    public TextMeshPro text;
+    public UE::Transform gauge;
 
-        Model.AddTime(Time.deltaTime);
+    protected override void Connect()
+    {
+        Model.PropertyChanged += Model_PropertyChanged;
+        base.Connect();
+    }
+    protected override void Disconnect()
+    {
+        base.Disconnect();
+        Model.PropertyChanged -= Model_PropertyChanged;
+    }
+
+    private void Model_PropertyChanged()
+    {
+        text.text = Model.Name;
+        gauge.localScale = new(Model.Value1, 1);
     }
 }
+

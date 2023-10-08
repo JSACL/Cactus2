@@ -5,55 +5,32 @@ using static Utils;
 using static System.MathF;
 using vec = UnityEngine.Vector3;
 using qtn = UnityEngine.Quaternion;
+using Nonno.Assets;
+using System;
 
-public class HumanoidViewModel<TModel> : RigidbodyViewModel<TModel> where TModel : class, IHumanoid
+public class HumanoidViewModel : EntityViewModel<IHumanoidPresenter>
 {
     public Animator animator_body;
-    public Transform transform_eye;
-    public ColliderComponent collider_body;
-    public TargetComponent target_body;
-    public TargetComponent target_foot;
+    public HeadViewModel headViewModel;
+    public FootViewModel footViewModel;
 
     protected override void Connect()
     {
         base.Connect();
-        Model.TransitBodyAnimation += TransitBodyAnimation;
+        Model.Transit += Model_Transit;
+        headViewModel.Model = Model.HeadPresenter;
+        footViewModel.Model = Model.FootPresenter;
     }
     protected override void Disconnect()
     {
-        Model.TransitBodyAnimation -= TransitBodyAnimation;
+        Model.Transit -= Model_Transit;
+        headViewModel.Model = null;
+        footViewModel.Model = null;
         base.Disconnect();
     }
 
-    protected void Start()
+    private void Model_Transit(float obj)
     {
-        target_foot.Executed += (_, e) =>
-        {
-            e.Command.Execute(Model);
-        };
-        target_body.Executed += (_, e) =>
-        {
-            e.Command.Execute(Model);
-        };
-        collider_body.Stay += (_, e) =>
-        {
-            Model.Impulse(Model.Position, e.Impulse);
-        };
-    }
-
-    protected new void Update()
-    {
-        base.Update();
-
-        Model.Impulse(Model.Position, Time.deltaTime * Model.Mass * Physics.gravity);
-
-        transform_eye.localRotation = Model.HeadRotation;
-    }
-
-    void TransitBodyAnimation(object? sender, AnimationTransitionEventArgs e)
-    {
-        Assert(animator_body is not null);
-
-        e.Apply(to: animator_body);
+        animator_body.CrossFade(Model.StateIndex.Value, obj, Model.AnimationContext.Layer, Model.AnimationOffset);
     }
 }

@@ -12,21 +12,18 @@ public class EntityTransformViewModel : ViewModel<IEntity>
         {
             if (stop && Model is Entity e)
             {
-                e.Velocity = Vector3.zero;
-                e.AngularVelocity = Vector3.zero;
+                e.Velocity = default;
             }
             else
             {
-                transform.position += Time.deltaTime * Model.Velocity;
-                transform.Rotate(Time.deltaTime * Model.AngularVelocity);
+                transform.position += Time.deltaTime * Model.Velocity.Linear.ToUnityVector3();
+                transform.Rotate(Time.deltaTime * Model.Velocity.Angular.ToUnityVector3());
             }
-            Model.Position = transform.position;
-            Model.Rotation = transform.rotation;
+            Model.Transform = transform.ToTransform();
         }
         else
         {
-            transform.position = Model.Position;
-            transform.rotation = Model.Rotation;
+            transform.Set(Model.Transform);
         }
     }
 }

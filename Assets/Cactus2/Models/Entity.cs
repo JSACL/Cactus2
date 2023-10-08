@@ -1,11 +1,10 @@
 #nullable enable
 using System;
-using UnityEngine;
-using vec = UnityEngine.Vector3;
 using static System.MathF;
 using static Utils;
-using TMPro;
-using Unity.VisualScripting;
+using Nonno.Assets;
+using Nonno.Assets.Presentation;
+using System.Numerics;
 
 public class Entity : IEntity
 {
@@ -13,10 +12,9 @@ public class Entity : IEntity
     DateTime _time;
     float _mass;
     float _mass_rec;
-    Quaternion _rotation;
-    vec _angularVelocity;
-    vec _velocity;
-    vec _position;
+    Transform _transform;
+    Displacement _velocity;
+    Authority _authority;
 
     protected internal bool SkipVelocityApplication { get; set; }
     public virtual IScene Scene
@@ -29,43 +27,22 @@ public class Entity : IEntity
             _scene.Add(this);
         }
     }
-    public vec Position
+    public Transform Transform
     {
-        get => _position;
-        set
-        {
-            AssertIsNumber(value);
-            _position = value;
-        }
+        get => _transform;
+        set => _transform = value;
     }
-    public Quaternion Rotation
-    {
-        get => _rotation;
-        set
-        {
-            _rotation = value;
-        }
-    }
-    public vec Velocity
+    public Displacement Velocity
     {
         get => _velocity;
         set
         {
-            AssertIsNumber(value);
-            _velocity = value;
-        }
-    }
-    public vec AngularVelocity
-    {
-        get => _angularVelocity;
-        set
-        {
-            const float A_V_MAX = 50;
-            if (value.x is < -A_V_MAX or > A_V_MAX ||
-                value.y is < -A_V_MAX or > A_V_MAX ||
-                value.z is < -A_V_MAX or > A_V_MAX) 
+            const float MAX = 50;
+            if (value.Angular.X is < -MAX or > MAX ||
+                value.Angular.Y is < -MAX or > MAX ||
+                value.Angular.Z is < -MAX or > MAX)
                 throw new ArgumentOutOfRangeException();
-            _angularVelocity = value;
+            _velocity = value;
         }
     }
     public float Mass
@@ -77,10 +54,6 @@ public class Entity : IEntity
             _mass = value;
             _mass_rec = 1 / value;
         }
-    }
-    internal float Mass_rec
-    {
-        get => _mass_rec;
     }
     public DateTime Time
     {
@@ -94,15 +67,27 @@ public class Entity : IEntity
             Update((float)dif.TotalSeconds);
         }
     }
-    public Authority Authority { get; set; } = Authority.Unknown;
+    public Authority Authority 
+    { 
+        get => _authority;
+        set
+        {
+            if (_authority != value)
+            {
+                _authority = value;
+                Authorize(value);
+            }
+        }
+    }
 
     public Entity(IScene scene)
     {
         _time = scene.Time;
         _scene = scene;
+        _authority = Authority.Unknown;
 
         Mass = 10;
-        Rotation = Quaternion.identity;
+        Transform = Transform.Identity;
     }
 
     public void AddTime(float deltaTime)
@@ -111,34 +96,21 @@ public class Entity : IEntity
         _time += TimeSpan.FromSeconds(deltaTime);
     }
 
+    protected virtual void Authorize(Authority authority)
+    {
+
+    }
+
     protected virtual void Update(float deltaTime)
     {
         if (!SkipVelocityApplication)
         {
-            Position += deltaTime * Velocity;
-            Rotation = Quaternion.Euler(deltaTime * AngularVelocity) * Rotation;
+            Transform += deltaTime * Velocity;
         }
     }
 
-    public virtual void Impulse(vec at, vec impulse)
+    public virtual void Impulse(Vector3 at, Vector3 impulse)
     {
-        Velocity += impulse * Mass_rec;
-    }
-
-    protected Vector3 GetLocalVelocity() => Quaternion.Inverse(Rotation) * Velocity;
-
-   public bool TrySetTag(Authority tag)
-    {
-        Authority = tag;
-        return true;
-    }
-
-    public virtual void Visit(IVisitor visitor)
-    {
-        visitor.Add(this);
-    }
-    public virtual void Forgo(IVisitor visitor)
-    {
-        visitor.Remove(this);
+        Velocity = new(Velocity.Linear + impulse * _mass_rec, Velocity.Angular);
     }
 }

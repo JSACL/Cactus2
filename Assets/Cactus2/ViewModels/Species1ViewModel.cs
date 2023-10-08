@@ -14,40 +14,10 @@ using System.Reflection;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Collections;
+using UE = UnityEngine;
 
-public class Species1ViewModel : RigidbodyViewModel<ISpecies1>
+public class Species1ViewModel : RigidbodyViewModel<IRigidbodyPresenter>
 {
-    TargetPositions _tC;
-
-    [Header("Internal")]
-    [SerializeField]
-    int _groundCount_onFoot;
-    [Header("External")]
-    [SerializeField]
-    ColliderComponent _bodyCES = null!;
-    [SerializeField]
-    TriggerComponent _footTES = null!;
-    [SerializeField]
-    TargetComponent _targetComponent = null!;
-    [SerializeField]
-    Transform _eyeT = null!;
-
-    void Start()
-    {
-        _bodyCES.Stay += (_, e) => { Model?.Impulse(Model.Position, e.Impulse); };
-        _targetComponent.Executed += (_, e) =>
-        {
-            e.Command.Execute(Model);
-        };
-
-        Model.TargetPositions = _tC = new OmnidirectionalTargetPositions(Model.Authority.Name);//, 100, 80);
-    }
-
-    protected new void Update()
-    {
-        base.Update();
-
-        _tC.EyePoint = _eyeT.position;
-        _tC.EyeRotation = _eyeT.rotation;
-    }
+    public ColliderComponent _bodyCES = null!;
+    public TargetComponent targetComponent;
 }

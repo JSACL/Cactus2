@@ -10,7 +10,7 @@ using System.Collections;
 
 namespace UnityChan
 {
-	[RequireComponent(typeof(Animator))]
+    [RequireComponent(typeof(Animator))]
 	public class IKCtrlRightHand : MonoBehaviour
 	{
 

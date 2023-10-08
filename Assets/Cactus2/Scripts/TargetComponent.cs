@@ -1,11 +1,15 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using Nonno.Assets;
 using UnityEngine;
 
-public class TargetComponent : SCComponent, IAuthorized
+public class TargetComponent : SCComponent
 {
-    public event CommandEventHandler? Executed;
-
-    public void Execute(ICommand command) => Executed?.Invoke(this, new(command));
+    public ICommand? Command { get; set; }
+    public void Affect(Typed info)
+    {
+        if (Command is { } && Command.CanExecute)
+            Command.Execute(info);
+    }
 }

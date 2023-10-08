@@ -2,11 +2,14 @@
 using static Unity.VisualScripting.Antlr3.Runtime.Tree.TreeWizard;
 using UnityEngine.UIElements;
 using System;
+using Nonno.Assets;
+using Nonno.Assets.Presentation;
 
 public abstract class Weapon : Entity, IWeapon
 {
     float _cooldownTimeRemaining;
 
+    public abstract string Name { get; }
     public float CooldownTimeRemaining => _cooldownTimeRemaining;
     public bool IsReadyToFire => CooldownTimeRemaining <= 0;
     public virtual float CooldownTime => 1f;
@@ -15,9 +18,6 @@ public abstract class Weapon : Entity, IWeapon
     public Weapon(IScene scene) : base(scene)
     {
     }
-
-    public override void Visit(IVisitor visitor) => visitor.Add(this);
-    public override void Forgo(IVisitor visitor) => visitor.Remove(this);
 
     protected override void Update(float deltaTime)
     {

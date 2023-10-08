@@ -4,14 +4,16 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using static Unity.VisualScripting.Antlr3.Runtime.Tree.TreeWizard;
+using vec = System.Numerics.Vector3;
+using qtn = System.Numerics.Quaternion;
 
 public class SuperintendentComponent : MonoBehaviour
 {
     public bool @break;
 
-    IScene _scene;
+    Scene _scene;
     TeamGameReferee _referee;
-    IVisitor _visitor;
+    //IVisitor _visitor;
 
     private void Start()
     {
@@ -22,14 +24,14 @@ public class SuperintendentComponent : MonoBehaviour
         var s_d = SceneManager.GetSceneByName("GeneratedScene");
 
         //SceneManager.LoadSceneAsync(s_d.buildIndex, LoadSceneMode.Additive);
-        var v1 = new LocalHostVisitor(s_d);
+        //var v1 = new LocalHostVisitor(s_d);
 
         //var s_a = SceneManager.GetSceneByName("AnotherScene");
         ////SceneManager.LoadSceneAsync(s_a.buildIndex, LoadSceneMode.Additive);
         //var v2 = new LocalHostVisitor(s_a);
 
-        _visitor = v1;//new CompositeVisitor(v1);
-        _scene.Visit(v1);
+        //_visitor = v1;//new CompositeVisitor(v1);
+        //_scene.Visit(v1);
 
         Init();
     }
@@ -62,17 +64,14 @@ public class SuperintendentComponent : MonoBehaviour
         var p = new Player(_scene)
         {
             Authority = t_f.Player,
-            Vitality = ConstantValues.PLAYER_VIGOR_STANDARD,
-            Resilience = 1.0f,
         };
-        p.Died += (sender, e) => { };
         p.Items.Add(new FugaFirer(_scene) { BulletIndex = t_f.Weapon });
         p.Items.Add(new FugaFirer(_scene) { BulletIndex = t_f.Weapon });
         p.Items.Add(new FugaFirer(_scene) { BulletIndex = t_f.Weapon });
         var s = new FugaEnemy(_scene)
         {
-            Velocity = Vector3.forward,
-            Position = new Vector3(0, 10, 0),
+            Transform = new(vec.UnitZ, qtn.Identity),
+            Velocity = new(vec.UnitZ, vec.Zero),
             Authority = t_e.Player,
             Gun = new LaserGun(_scene)
             {

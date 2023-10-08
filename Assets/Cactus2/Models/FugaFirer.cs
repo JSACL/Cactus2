@@ -1,9 +1,11 @@
 #nullable enable
-using System;
-using UnityEngine;
+using System.Numerics;
+using Nonno.Assets;
 
-public class FugaFirer : Weapon, IFirer
+public class FugaFirer : Weapon
 {
+    public override string Name => "Fuga Firer";
+
     public FugaFirer(IScene scene) : base(scene)
     {
 
@@ -14,9 +16,8 @@ public class FugaFirer : Weapon, IFirer
         Scene.Add(new Bullet(Scene)
         {
             Authority = tag,
-            Rotation = Rotation,
-            Position = Position,
-            Velocity = Rotation * (20 * Vector3.forward),
+            Transform = Transform,
+            Velocity = new(Vector3.Transform(20 * Vector3.UnitZ, Transform.Rotation), Vector3.Zero),
         });
     }
 }

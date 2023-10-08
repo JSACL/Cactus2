@@ -201,7 +201,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &5455634655992551222
 Transform:
   m_ObjectHideFlags: 0
@@ -230,10 +230,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7fd7fc91a5bcc843a6885d10b3ec012, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lerp: 1
-  _rigidbody: {fileID: 4110388248862740270}
-  _groundCount_onFoot: 0
+  rigidbody: {fileID: 4110388248862740270}
   _bodyCES: {fileID: 4351851096900964001}
-  _footTES: {fileID: 1947235165932079712}
-  _targetComponent: {fileID: 7484279549697046756}
-  _eyeT: {fileID: 6818657682399487949}
+  targetComponent: {fileID: 7484279549697046756}

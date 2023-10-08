@@ -1,7 +1,8 @@
 #nullable enable
 
 using System;
-using UnityEngine;
+using Nonno.Assets;
+using System.Numerics;
 
 public class LaserGun : Weapon
 {
@@ -11,13 +12,11 @@ public class LaserGun : Weapon
     public Vector3 TargetPosition { get; set; }
     public TimeSpan Span => new(0, 0, 2);
     public override float CooldownTime => 5;
+    public override string Name => "Laser Gun";
 
     public LaserGun(IScene scene) : base(scene)
     {
     }
-
-    public override void Visit(IVisitor visitor) => visitor.Add(this);
-    public override void Forgo(IVisitor visitor) => visitor.Remove(this);
 
     protected override void Update(float deltaTime)
     {
@@ -32,20 +31,21 @@ public class LaserGun : Weapon
         if (_laserHavingFired is not null)
         {
             // レーザーを照射し続ける。
-            _laserHavingFired.Length = (_laserHavingFired.Position - Position).magnitude;
+            _laserHavingFired.Length = Vector3.Distance(_laserHavingFired.Transform.Position, Transform.Position);
         }
     }
 
-    protected override void Fire(Authority tag)
+    protected override void Fire(Authority authority)
     {
-        var v = TargetPosition - Position;
-        var v_n = v.normalized;
+        var v = TargetPosition - Transform.Position;
+        var v_n = Vector3.Normalize(v);
+        var r = Utils.LookRotation(v, Vector3.UnitZ);
+        Transform = new(Transform.Position, r);
         Scene.Add(_laserHavingFired = new Laser(Scene)
         {
-            Position = Position,
-            Velocity = 100 * v_n,
-            Authority = tag,
-            Rotation = Quaternion.LookRotation(v),
+            Transform = Transform,
+            Velocity = new(100 * v_n, Vector3.Zero),
+            Authority = authority,
         });
         _timeToStop = Time + Span;
     }

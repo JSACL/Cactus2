@@ -1,72 +1,47 @@
 #nullable enable
 using System;
+using Nonno.Assets;
 using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UIElements;
 using static Utils;
+using UE = UnityEngine;
 
-public class LaserViewModel : ViewModel<ILaser>
+public class LaserViewModel : ViewModel<ILaserPresenter>
 {
-    readonly HitCommand _hitCommand = new();
-
-    public Transform tf_head;
-    public Transform tf_collider;
+    public UE::Transform tf_head;
+    public UE::Transform tf_collider;
     public AudioClip clip_breakingSE;
     public GameObject obj_hitEffect;
     public AudioSource audioSource;
-    public StayCommandComponent stC_body;
+    public StayEffectComponent stC_body;
     public TargetComponent tC_body;
 
     protected override void Connect()
     {
         base.Connect();
         Model.ShowEffect += ShowEffect;
+        Model.PropertyChanged += Model_PropertyChanged;
+        stC_body.Effect = Model.HitEffect;
     }
     protected override void Disconnect()
     {
         Model.ShowEffect -= ShowEffect;
+        Model.PropertyChanged -= Model_PropertyChanged;
+        stC_body.Effect = null;
         base.Disconnect();
     }
 
     void Start()
     {
-        stC_body.Command = _hitCommand;
-        tC_body.Executed += (_, e) =>
-        {
-            e.Command.Execute(Model);
-        };
-    }
-
-    protected void OnEnable()
-    {
-        _hitCommand.Authority = Model.Authority;
-        _hitCommand.DamageForResilience = 0.002f;
-        _hitCommand.DamageForVitality = 0.001f;
-        _hitCommand.IsValid = true;
-
+        tC_body.Command = new DelegatedCommand(Model.Hit);
         obj_hitEffect.SetActive(false);
-
-        if (Model is null) return;
-        
-        tf_head.SetPositionAndRotation(Model.Position, Model.Rotation);
-        tf_collider.SetPositionAndRotation(Model.Position, Model.Rotation);
-        //if (_speaker != null)
-        //{
-        //    _speaker.transform.position = transform.position;
-        //}
     }
 
-    protected void Update()
-    {
-        if (Model is null) return;
-
-        tf_head.SetPositionAndRotation(Model.Position, Model.Rotation);
-        var mid = Model.Position - 0.5f * Model.Length * (Model.Rotation * Vector3.forward);
-        tf_collider.SetPositionAndRotation(mid, Model.Rotation);
-        tf_collider.localScale = new(1, 1, Model.Length);
-    }
+    protected void Update() => Model.AddTime(Time.deltaTime);
+    private void FixedUpdate() => Model.Elapsed();
 
     void ShowEffect(object? sender, EventArgs e)
     {
@@ -74,5 +49,12 @@ public class LaserViewModel : ViewModel<ILaser>
         obj_hitEffect.SetActive(true);
         audioSource.transform.position = tf_head.transform.position;
         audioSource.PlayOneShot(clip_breakingSE);
+    }
+
+    private void Model_PropertyChanged()
+    {
+        tf_head.Set(Model.Transform);
+        tf_collider.Set(Model.Transform);
+        tf_collider.localScale = new(1, 1, Model.Length);
     }
 }

@@ -2,12 +2,17 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System;
-using UED =  UnityEngine.Debug;
+using UED = UnityEngine.Debug;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using static UnityEngine.ParticleSystem;
 using System.Linq;
+using UE = UnityEngine;
+using SN = System.Numerics;
+using Nonno.Assets;
+using Nonno.Assets.Presentation;
+using Transform = Nonno.Assets.Presentation.Transform;
 
 public static class Utils
 {
@@ -53,44 +58,6 @@ public static class Utils
         _ => x
     };
 
-    public static int OneHot(int shift) => 1 << shift;
-    public static int ShiftOf(int oneHot) => oneHot switch
-    {
-        1 => 0,
-        2 => 1,
-        4 => 2,
-        8 => 3,
-        16 => 4,
-        32 => 5,
-        64 => 6,
-        128 => 7,
-        256 => 8,
-        512 => 9,
-        1024 => 10,
-        2048 => 11,
-        4096 => 12,
-        8192 => 13,
-        16384 => 14,
-        32768 => 15,
-        65536 => 16,
-        131072 => 17,
-        262144 => 18,
-        524288 => 19,
-        1048576 => 20,
-        2097152 => 21,
-        4194304 => 22,
-        8388608 => 23,
-        16777216 => 24,
-        33554432 => 25,
-        67108864 => 26,
-        134217728 => 27,
-        268435456 => 28,
-        536870912 => 29,
-        1073741824 => 30,
-        -2147483648 => 31,
-        _ => throw new ArgumentException()
-    };
-
     public static IEnumerable<T> Foreach<T>(this IEnumerable<T> @this, Action<T> callback)
     {
         foreach (var item in @this)
@@ -118,7 +85,7 @@ public static class Utils
 
     public static T? GetComponentIC<T>(this Component @this, string name, bool includeInactive = false) where T : Component => GetComponentIC<T>(@this.transform, name, includeInactive);
     public static T? GetComponentIC<T>(this GameObject @this, string name, bool includeInactive = false) where T : Component => GetComponentIC<T>(@this.transform, name, includeInactive);
-    public static T? GetComponentIC<T>(this Transform @this, string name, bool includeInactive = false) where T : Component
+    public static T? GetComponentIC<T>(this UE::Transform @this, string name, bool includeInactive = false) where T : Component
     {
         if (@this.name == name && @this.TryGetComponent<T>(out var r)) return r;
         var l = @this.childCount;
@@ -128,6 +95,43 @@ public static class Utils
         }
         return null;
     }
+
+    public static void Set(this UE::Transform @this, Transform transform)
+    {
+        @this.SetPositionAndRotation(transform.Position.ToUnityVector3(), transform.Rotation.ToUnityQuaternion());
+    }
+    public static Transform ToTransform(this UE::Transform @this)
+    {
+        return new(@this.position.ToVector3(), @this.rotation.ToQuaternion());
+    }
+    public static unsafe UE::Vector3 ToUnityVector3(this SN::Vector3 @this)
+    {
+        return new(@this.X, @this.Y, @this.Z);
+        //return *(Vector3*)&@this;
+    }
+    public static unsafe UE::Quaternion ToUnityQuaternion(this SN::Quaternion @this)
+    {
+        return new(@this.X, @this.Y, @this.Z, @this.W);
+        //return *(Quaternion*)&@this;
+    }
+    public static unsafe SN::Vector3 ToVector3(this UE::Vector3 @this)
+    {
+        return new(@this.x, @this.y, @this.z);
+    }
+    public static unsafe SN::Quaternion ToQuaternion(this UE::Quaternion @this)
+    {
+        return new(@this.x, @this.y, @this.z, @this.w);
+    }
+    public static SN::Quaternion ToQuaternion(this SN::Vector3 @this) => SN::Quaternion.CreateFromYawPitchRoll(@this.X, @this.Y, @this.Z);
+    public static SN::Quaternion LookRotation(SN::Vector3 at, SN::Vector3 identity)
+    {
+        var c = SN::Vector3.Cross(at, identity);
+        var a = MathF.Asin(c.Length());
+        return SN::Quaternion.CreateFromAxisAngle(c, a);
+    }
+
+    public static void Add<T>(this IScene @this, T obj) => @this.Add(Typed.Get(obj));
+    public static void Remove<T>(this IScene @this, T obj) => @this.Remove(Typed.Get(obj));
 
     public static IEnumerable<TComponent> WithinSight<TComponent>(this IEnumerable<TComponent> @this, Vector3 p, Quaternion d, float x, float y) where TComponent : Component
     {

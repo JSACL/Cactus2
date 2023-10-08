@@ -45,10 +45,6 @@ MonoBehaviour:
     m_Address: Assets/Cactus2/Views/Entity.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: 7aac8eed089933a4d918fc3f9d94fdd5
-    m_Address: Assets/Cactus2/Views/CombatUI.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
   - m_GUID: 7d34c051924816246b99f35c55a0fbe0
     m_Address: Assets/Cactus2/Views/Bullet.prefab
     m_ReadOnly: 0

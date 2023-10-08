@@ -6,37 +6,31 @@ using static System.MathF;
 using vec = UnityEngine.Vector3;
 using qtn = UnityEngine.Quaternion;
 
-public class RigidbodyViewModel<TModel> : ViewModel<TModel> where TModel : class, IEntity
+public class RigidbodyViewModel<TModel> : ViewModel<TModel> where TModel : class, IRigidbodyPresenter
 {
-    const float POS_ADJUSTMENT_PROMPTNESS = 3f;
-    const float ROT_ADJUSTMENT_PROMPTNESS = 100.0f;
+    public new Rigidbody rigidbody;
 
-    public bool lerp = true;
-
-    [SerializeField]
-    Rigidbody _rigidbody;
-
-    public bool UseGravity { get; protected set; }
-
-    protected void OnEnable()
+    protected override void Connect()
     {
-        _rigidbody.position = Model.Position;
-        _rigidbody.rotation = Model.Rotation;
+        base.Connect();
+        Model.PropertyChanged += Reflect;
+    }
+    protected override void Disconnect()
+    {
+        Model.PropertyChanged -= Reflect;
+        base.Disconnect();
     }
 
-    protected void FixedUpdate()
+    protected virtual void Reflect()
     {
-        _rigidbody.position = lerp ? vec.Lerp(Model.Position, _rigidbody.position, Exp(-POS_ADJUSTMENT_PROMPTNESS * Time.deltaTime)) : Model.Position;
-        _rigidbody.rotation = lerp ? qtn.Lerp(Model.Rotation, _rigidbody.rotation, Exp(-ROT_ADJUSTMENT_PROMPTNESS * Time.deltaTime)) : Model.Rotation;
-        _rigidbody.velocity = Model.Velocity;
-        _rigidbody.angularVelocity = Model.AngularVelocity;
-        _rigidbody.mass = Model.Mass;
+        rigidbody.position = Model.Transform.Position.ToUnityVector3();
+        rigidbody.rotation = Model.Transform.Rotation.ToUnityQuaternion();
+        rigidbody.angularVelocity = Model.Velocity.Angular.ToUnityVector3();
+        rigidbody.velocity = Model.Velocity.Linear.ToUnityVector3();
+        rigidbody.mass = Model.Mass;
     }
 
-    protected void Update()
-    {
-        Assert(Model is { });
+    protected void FixedUpdate() => Model.Elapsed(1);
 
-        Model.AddTime(Time.deltaTime);
-    }
+    protected void Update() => Model.AddTime(Time.deltaTime);
 }

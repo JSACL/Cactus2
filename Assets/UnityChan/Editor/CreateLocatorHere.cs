@@ -11,6 +11,7 @@ using UnityEditor;
 
 namespace UnityChan
 {
+	using Transform = UnityEngine.Transform;
 	public class CreateLocatorHere
 	{
 		// Add menu to the main menu

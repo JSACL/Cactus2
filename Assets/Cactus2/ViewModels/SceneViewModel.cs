@@ -1,15 +1,47 @@
-using TMPro;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data.Common;
+using System.Runtime.CompilerServices;
+using Nonno.Assets;
+using Nonno.Assets.Presentation;
+using UnityEditor.SearchService;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UESM = UnityEngine.SceneManagement;
 
-public class SceneViewModel : ViewModel<IScene>
+public class SceneViewModel : ViewModel<Scene>
 {
-    [SerializeField]
-    TextMeshPro _text;
+    readonly FamilyHelper _helper;
 
-    private void Update()
+    public UESM::Scene Scene => _helper.Scene;
+
+    public SceneViewModel()
     {
-        _text.text = 
-            $"Time: {Model.Time}" +
-            $"That's all.";
+        _helper = new();
+    }
+
+    protected new void Awake()
+    {
+        base.Awake();
+
+        _helper.Scene = SceneManager.GetActiveScene();
+
+        _helper.S<IPlayer, HumanoidPresenter<IPlayer>, HumanoidViewModel>("Assets/Cactus2/Views/Player.prefab");
+    }
+
+    protected override void Connect()
+    {
+        base.Connect();
+        Model.FamilyChanged += _helper.HandleFamilyChange;
+    }
+    protected override void Disconnect()
+    {
+        Model.FamilyChanged -= _helper.HandleFamilyChange;
+        base.Disconnect();
+    }
+
+    protected void Update()
+    {
+        ((IScene)Model).AddTime(Time.deltaTime);
     }
 }

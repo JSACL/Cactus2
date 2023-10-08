@@ -14,6 +14,7 @@ public class Player : Humanoid, IPlayer
 {
     int _itemNumber;
     readonly List<IItem> _items;
+    readonly GameStatus _status;
 
     public int SelectedItemIndex
     {
@@ -25,13 +26,13 @@ public class Player : Humanoid, IPlayer
     }
     public IList<IItem> Items => _items;
     IReadOnlyList<IItem> IPlayer.Items => _items;
+    public IStatus Status => _status;
 
     public Player(IScene scene) : base(scene)
     {
         _items = new();
+        _status = new("Main Player") { Resilience = 1.0f, Vitality = 1.0f };
     }
-    public override void Visit(IVisitor visitor) => visitor.Add(this);
-    public override void Forgo(IVisitor visitor) => visitor.Remove(this);
 
     public void Fire(float timeSpan)
     {
@@ -43,102 +44,13 @@ public class Player : Humanoid, IPlayer
 
     protected override void Update(float deltaTime)
     {
-        Want(FootIsOn, "FootIsOff");
-
-        // 真偽的動作...押してる間ずっとのやつ
-        //if (FootIsOn)
-        //{
-        //    switch (
-        //        GetKey(KeyCode.W),
-        //        GetKey(KeyCode.S))
-        //    {
-        //    case (true, false):
-        //        break;
-        //    case (false, true):
-        //        Force_leg += deltaTime * MOVEMENT_PROMPTNESS * vec.back;
-        //        break;
-        //    case (false, false):
-        //        var f = Force_leg;
-        //        var v = vec.Dot(Velocity, Rotation * vec.forward);
-        //        f.z = deltaTime * -STOP_PROMPTNESS * PullUp(STOP_PULL_UP_COEF * v);
-        //        Force_leg = f;
-        //        break;
-        //    }
-        //    switch (
-        //        GetKey(KeyCode.A),//GetButton(A_N_MOV_LEFT), 
-        //        GetKey(KeyCode.D))//GetButton(A_N_MOV_RIGHT))
-        //    {
-        //    case (true, false):
-        //        Force_leg += deltaTime * MOVEMENT_PROMPTNESS * vec.left;
-        //        break;
-        //    case (false, true):
-        //        Force_leg += deltaTime * MOVEMENT_PROMPTNESS * vec.right;
-        //        break;
-        //    case (false, false):
-        //        var f = Force_leg;
-        //        var v = vec.Dot(Velocity, Rotation * vec.right);
-        //        f.x = deltaTime * -STOP_PROMPTNESS * PullUp(STOP_PULL_UP_COEF * v);
-        //        Force_leg = f;
-        //        break;
-        //    }
-        //}
-
         base.Update(deltaTime);
 
-        foreach (var item in _items) 
+        foreach (var item in _items)
         {
             // TODO: この条件分は怠惰。
             if (item is not IEntity entity) continue;
-            entity.Position = Position + vec.up;
-            entity.Rotation = Rotation * HeadRotation;
+            entity.Transform = Transform;
         }
-        //Items[SelectedItemIndex].Rotation = Rotation;
     }
-
-    //protected override void Elapsed(object? sender, ElapsedEventArgs e)
-    //{
-    //    //Want(sender is PlayerBehaviour, "Elapsedが想定のゲームオブジェクト以外から送られてきてます。まぁ、大丈夫でしょうが、スレッド系のエラーに悩んだら確認してみてください。");
-    //    Want(FootIsOn, "FootIsOff");
-
-    //    // 真偽的動作...押してる間ずっとのやつ
-    //    if (FootIsOn)
-    //    {
-    //        switch (
-    //            GetKey(KeyCode.W),
-    //            GetKey(KeyCode.S))
-    //        {
-    //        case (true, false):
-    //            Force_leg += e.DeltaTime * MOVEMENT_PROMPTNESS * vec.forward;
-    //            break;
-    //        case (false, true):
-    //            Force_leg += e.DeltaTime * MOVEMENT_PROMPTNESS * vec.back;
-    //            break;
-    //        case (false, false):
-    //            var f = Force_leg;
-    //            var v = vec.Dot(Velocity, Rotation * vec.forward);
-    //            f.z = e.DeltaTime * -STOP_PROMPTNESS * PullUp(STOP_PULL_UP_COEF * v);
-    //            Force_leg = f;
-    //            break;
-    //        }
-    //        switch (
-    //            GetKey(KeyCode.A),//GetButton(A_N_MOV_LEFT), 
-    //            GetKey(KeyCode.D))//GetButton(A_N_MOV_RIGHT))
-    //        {
-    //        case (true, false):
-    //            Force_leg += e.DeltaTime * MOVEMENT_PROMPTNESS * vec.left;
-    //            break;
-    //        case (false, true):
-    //            Force_leg += e.DeltaTime * MOVEMENT_PROMPTNESS * vec.right;
-    //            break;
-    //        case (false, false):
-    //            var f = Force_leg;
-    //            var v = vec.Dot(Velocity, Rotation * vec.right);
-    //            f.x = e.DeltaTime * -STOP_PROMPTNESS * PullUp(STOP_PULL_UP_COEF * v);
-    //            Force_leg = f;
-    //            break;
-    //        }
-    //    }
-
-    //    base.Elapsed(sender, e);
-    //}
 }

@@ -593,20 +593,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8122715379943040534}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5838a89d69157a54ca345cb2e0392838, type: 3}
+  m_Script: {fileID: 11500000, guid: 45b9d643de6cbb44d95c3b80a2b95d3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lerp: 1
-  _rigidbody: {fileID: 3274717702096737110}
-  tf_collider: {fileID: 3274717702096737109}
-  clip_breakingSE: {fileID: 8300000, guid: c8842a9feb9dda94abc70ca64be00d3a, type: 3}
-  obj_hitEffect: {fileID: 3274717701519755602}
-  audioSource: {fileID: 3274717701293412765}
-  enC_body: {fileID: 4824231805834809694}
-  tC_body: {fileID: 8270192885305743924}
-  col_body: {fileID: 8817953917731332714}
-  _adsorbOnApproaching: 0
-  _thresholdDistance_absorption: 0
-  AttachTarget: 0
-  AttachDistance: 0
-  Attached: 0
+  transform: {fileID: 3274717702096737109}
