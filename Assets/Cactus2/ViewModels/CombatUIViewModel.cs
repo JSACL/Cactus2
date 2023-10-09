@@ -4,6 +4,7 @@ using System.Linq;
 using Nonno.Assets;
 using UnityEngine;
 using static Utils;
+using Time = UnityEngine.Time;
 
 public class CombatUIViewModel : ViewModel<ICombatUIPresenter>
 {

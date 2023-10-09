@@ -7,6 +7,7 @@ using Nonno.Assets.Presentation;
 using UnityEditor.SearchService;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Time = UnityEngine.Time;
 using UESM = UnityEngine.SceneManagement;
 
 public class SceneViewModel : ViewModel<Scene>
@@ -26,7 +27,8 @@ public class SceneViewModel : ViewModel<Scene>
 
         _helper.Scene = SceneManager.GetActiveScene();
 
-        _helper.S<IPlayer, HumanoidPresenter<IPlayer>, HumanoidViewModel>("Assets/Cactus2/Views/Player.prefab");
+        //_helper.S<IPlayer, HumanoidPresenter<IPlayer>, HumanoidViewModel>("Assets/Cactus2/Views/Player.prefab");
+        _helper.IgnoreUnknownModel();
     }
 
     protected override void Connect()

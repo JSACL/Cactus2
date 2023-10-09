@@ -3,6 +3,7 @@ using Nonno.Assets;
 using Nonno.Assets.Presentation;
 using UnityEngine;
 using System;
+using Nonno.Assets.Collections;
 
 public class FamilyHelper
 {
@@ -28,7 +29,10 @@ public class FamilyHelper
     {
         if (!_scene.IsValid()) throw new Exception("シーンが無効です。");
         var source = new GameObjectSource<TViewModel>(address, _scene);
-        _adD.Overload<TModel>(x => source.Get().Model = new TPresenter() { Model = x });
+        _adD.Overload<TModel>(x =>
+        {
+            source.Get().Model = new TPresenter() { Model = x };
+        });
         _rmD.Overload<TModel>(x =>
         {
             var vm = (TViewModel)_vMs[x];
@@ -47,6 +51,17 @@ public class FamilyHelper
             source.Release(vm);
             ((TPresenter)((IViewModel)vm).Model).Model = null;
         });
+    }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <remarks>
+    /// 最後に呼んで下さい。
+    /// </remarks>
+    public void IgnoreUnknownModel()
+    {
+        _adD.Overload<object>(o => { });
+        _rmD.Overload<object>(o => { });
     }
 
     public void HandleFamilyChange(object? sender, FamilyChangeEventArgs e)

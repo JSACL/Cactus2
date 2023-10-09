@@ -1,5 +1,6 @@
 #nullable enable
 using Nonno.Assets;
+using Nonno.Assets.Collections;
 using UnityEngine;
 
 public class GroundViewModel : ViewModel<IGround>

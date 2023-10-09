@@ -16,6 +16,7 @@ using Transform = Nonno.Assets.Presentation.Transform;
 
 public static class Utils
 {
+
     [Conditional("DEBUG")]
     public static void Want(bool condition, object? message = null, [CallerFilePath] string path = "", [CallerLineNumber] int line = -1)
     {
@@ -41,31 +42,6 @@ public static class Utils
     }
 
     public static Quaternion Rotated(this Quaternion @this, Vector3 by) => Quaternion.Euler(by) * @this;
-
-    // 300系みたいな形の関数。
-    public static float Shinkansen300(float x) => x switch
-    {
-        <= 0 => 1,
-        <= 0.75f => 1 - (2 / 3f) * x,
-        <= 1f => 2 - 2 * x,
-        _ => 0
-    };
-
-    public static float PullUp(float x) => x switch
-    {
-        <= -1 => -1,
-        >= 1 => 1,
-        _ => x
-    };
-
-    public static IEnumerable<T> Foreach<T>(this IEnumerable<T> @this, Action<T> callback)
-    {
-        foreach (var item in @this)
-        {
-            callback(item);
-            yield return item;
-        }
-    }
 
     public static Quaternion Multiply(this Quaternion @this, float by)
     {
@@ -123,15 +99,6 @@ public static class Utils
         return new(@this.x, @this.y, @this.z, @this.w);
     }
     public static SN::Quaternion ToQuaternion(this SN::Vector3 @this) => SN::Quaternion.CreateFromYawPitchRoll(@this.X, @this.Y, @this.Z);
-    public static SN::Quaternion LookRotation(SN::Vector3 at, SN::Vector3 identity)
-    {
-        var c = SN::Vector3.Cross(at, identity);
-        var a = MathF.Asin(c.Length());
-        return SN::Quaternion.CreateFromAxisAngle(c, a);
-    }
-
-    public static void Add<T>(this IScene @this, T obj) => @this.Add(Typed.Get(obj));
-    public static void Remove<T>(this IScene @this, T obj) => @this.Remove(Typed.Get(obj));
 
     public static IEnumerable<TComponent> WithinSight<TComponent>(this IEnumerable<TComponent> @this, Vector3 p, Quaternion d, float x, float y) where TComponent : Component
     {

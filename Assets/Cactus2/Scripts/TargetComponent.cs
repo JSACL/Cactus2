@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Nonno.Assets;
+using Nonno.Assets.Collections;
 using UnityEngine;
 
 public class TargetComponent : SCComponent

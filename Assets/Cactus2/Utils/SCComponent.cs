@@ -25,7 +25,7 @@ public class SCComponentInfo
     public SCComponentInfo(Type type)
     {
         ShortCircuitIsAvailable = true;
-        LayerMask = DynamicMask.GetNew(SceneConfiguration.Current.LayerMaskProvider, $"To short-circuit component: {type.Name}.");
+        LayerMask = DynamicMask.GetNew(Cactus2Utils.LayerMaskProvider, $"To short-circuit component: {type.Name}.");
     }
 
     public static SCComponentInfo GetInfo(Type type)

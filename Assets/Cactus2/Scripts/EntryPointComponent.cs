@@ -1,50 +1,21 @@
 using System;
-using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using static Unity.VisualScripting.Antlr3.Runtime.Tree.TreeWizard;
 using vec = System.Numerics.Vector3;
 using qtn = System.Numerics.Quaternion;
 
-public class SuperintendentComponent : MonoBehaviour
+[RequireComponent(typeof(SceneViewModel))]
+public class EntryPointComponent : MonoBehaviour
 {
-    public bool @break;
-    public SceneViewModel scene;
-
     Scene _scene;
     TeamGameReferee _referee;
-    //IVisitor _visitor;
 
-    private void Start()
+    private void Awake()
     {
-        TaskScheduler.UnobservedTaskException += (sender, e) => Debug.LogError(e);
-
         _scene = new Scene(DateTime.Now, _referee = new TeamGameReferee());
-        scene.Model = _scene;
-        //var s_d = SceneManager.GetSceneByName("GeneratedScene");
-
-        //SceneManager.LoadSceneAsync(s_d.buildIndex, LoadSceneMode.Additive);
-        //var v1 = new LocalHostVisitor(s_d);
-
-        //var s_a = SceneManager.GetSceneByName("AnotherScene");
-        ////SceneManager.LoadSceneAsync(s_a.buildIndex, LoadSceneMode.Additive);
-        //var v2 = new LocalHostVisitor(s_a);
-
-        //_visitor = v1;//new CompositeVisitor(v1);
-        //_scene.Visit(v1);
+        var svm = GetComponent<SceneViewModel>();
+        svm.Model = _scene;
 
         Init();
-    }
-
-    private void Update()
-    {
-        if (@break)
-        {
-            ;
-            @break = false;
-            ;
-        }
     }
 
     void Init()

@@ -1,4 +1,5 @@
 using Nonno.Assets;
+using Nonno.Assets.Collections;
 
 public class FootViewModel : ViewModel<ITargetPresenter>, ICommand
 {
