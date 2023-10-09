@@ -1,10 +1,6 @@
 #nullable enable
-using System;
 using UnityEngine;
-using static Utils;
-using static System.MathF;
-using vec = UnityEngine.Vector3;
-using qtn = UnityEngine.Quaternion;
+using Cactus2.Presenter;
 
 public class RigidbodyViewModel<TModel> : ViewModel<TModel> where TModel : class, IRigidbodyPresenter
 {

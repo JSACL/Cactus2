@@ -1,12 +1,8 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Numerics;
 using System.Threading.Tasks;
-using Nonno.Assets;
-using Nonno.Assets.Presentation;
 
+namespace Cactus2;
 public interface IReferee
 {
     Judgement Judge(Authority offensiveSide, Authority defensiveSide);
@@ -100,7 +96,7 @@ public interface IHumanoid : IAnimal, IViewer
     bool FootIsOn { get; set; }
     Quaternion HeadRotation { get; set; }
 
-    void Turn(Vector3 to) => HeadRotation = Cactus2Utils.LookRotation(to - Transform.Position, Vector3.UnitZ);
+    void Turn(Vector3 to) => HeadRotation = Utils.LookRotation(to - Transform.Position, Vector3.UnitZ);
     void Seek(bool forward, bool backward, bool right, bool left, float strength)
     {
         var x = 0f;

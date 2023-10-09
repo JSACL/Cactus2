@@ -1,7 +1,7 @@
 #nullable enable
 using System.Numerics;
-using Nonno.Assets;
 
+namespace Cactus2;
 public class FugaFirer : Weapon
 {
     public override string Name => "Fuga Firer";

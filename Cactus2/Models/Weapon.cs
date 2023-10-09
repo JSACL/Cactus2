@@ -1,8 +1,6 @@
 #nullable enable
-using System;
-using Nonno.Assets;
-using Nonno.Assets.Presentation;
 
+namespace Cactus2;
 public abstract class Weapon : Entity, IWeapon
 {
     float _cooldownTimeRemaining;

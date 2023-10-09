@@ -1,12 +1,6 @@
 #nullable enable
-using System.Collections.Generic;
 using UnityEngine;
-using static Utils;
-using static System.MathF;
-using vec = UnityEngine.Vector3;
-using qtn = UnityEngine.Quaternion;
-using Nonno.Assets;
-using System;
+using Cactus2.Presenter;
 
 public class HumanoidViewModel : EntityViewModel<IHumanoidPresenter>
 {

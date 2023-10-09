@@ -1,16 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Runtime.CompilerServices;
-using Nonno.Assets;
-using Nonno.Assets.Presentation;
-using UnityEditor.SearchService;
-using UnityEngine;
+using Cactus2;
 using UnityEngine.SceneManagement;
 using Time = UnityEngine.Time;
 using UESM = UnityEngine.SceneManagement;
 
-public class SceneViewModel : ViewModel<Scene>
+public class SceneViewModel : ViewModel<Cactus2.Scene>
 {
     readonly FamilyHelper _helper;
 

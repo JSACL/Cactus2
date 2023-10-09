@@ -1,11 +1,6 @@
 ﻿#nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Nonno.Assets;
 
+namespace Cactus2.Presenter;
 public class LaserPresenter<TModel> : RigidbodyPresenter<TModel>, ILaserPresenter where TModel : ILaser
 {
     public float Length => Model.Length;

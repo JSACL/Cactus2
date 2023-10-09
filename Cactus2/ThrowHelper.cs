@@ -1,6 +1,6 @@
 #nullable enable
-using System;
 
+namespace Cactus2;
 public static class ThrowHelper
 {
     public static void ThrowIfNot(bool @this, Func<Exception>? constructor = null)

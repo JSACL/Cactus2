@@ -1,4 +1,4 @@
-using Nonno.Assets.Presentation;
+namespace Cactus2.Presenter;
 
 public class GameStatusPresenter<TModel> : Presenter<TModel>, IStatusGaugePresenter where TModel : IStatus
 {

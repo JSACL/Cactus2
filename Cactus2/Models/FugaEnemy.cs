@@ -1,15 +1,7 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Assets.Cactus2;
-using Nonno.Assets;
 using System.Numerics;
-using static ConstantValues;
-using static Cactus2Utils;
-using Random = System.Random;
 
+namespace Cactus2;
 public class FugaEnemy : Animal, IAnimal, IViewer
 {
     public const float FORCE_REDUCTION_RATE_PER_SEC = 0.001f;

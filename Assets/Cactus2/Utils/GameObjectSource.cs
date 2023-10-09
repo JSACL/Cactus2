@@ -6,7 +6,6 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.SceneManagement;
 using UnityEngine;
 using UE = UnityEngine;
-using Nonno.Assets.Presentation;
 
 public class GameObjectSource<TComponent> : IObjectSource<TComponent> where TComponent : Component
 {

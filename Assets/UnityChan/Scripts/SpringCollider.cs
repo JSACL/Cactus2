@@ -7,11 +7,10 @@
 //https://twitter.com/ricopin416
 //
 using UnityEngine;
-using System.Collections;
 
 namespace UnityChan
 {
-	public class SpringCollider : MonoBehaviour
+    public class SpringCollider : MonoBehaviour
 	{
 		//半径
 		public float radius = 0.5f;

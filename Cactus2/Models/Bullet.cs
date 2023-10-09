@@ -1,8 +1,6 @@
 #nullable enable
-using System;
-using System.Threading.Tasks;
-using Nonno.Assets;
-using Nonno.Assets.Presentation;
+
+namespace Cactus2;
 
 public class Bullet : Entity, IBullet
 {

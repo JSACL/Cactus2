@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 namespace UnityChan
 {
-	public class FaceUpdate : MonoBehaviour
+    public class FaceUpdate : MonoBehaviour
 	{
 		public AnimationClip[] animations;
 		Animator anim;

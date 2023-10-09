@@ -1,10 +1,6 @@
 #nullable enable
 
-using System;
-using System.Threading.Tasks;
-using static Cactus2Utils;
-using static System.Math;
-using Nonno.Assets.Presentation;
+namespace Cactus2;
 
 public class Animal : Entity, IAnimal
 {

@@ -4,12 +4,11 @@
 // 2014/03/13 N.Kobyasahi
 //
 using UnityEngine;
-using System.Collections;
 
 namespace UnityChan
 {
-// 必要なコンポーネントの列記
-	[RequireComponent(typeof(Animator))]
+    // 必要なコンポーネントの列記
+    [RequireComponent(typeof(Animator))]
 	[RequireComponent(typeof(CapsuleCollider))]
 	[RequireComponent(typeof(Rigidbody))]
 

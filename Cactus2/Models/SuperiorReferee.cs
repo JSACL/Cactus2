@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Nonno.Assets;
 
+namespace Cactus2;
 public class SuperiorReferee : IReferee
 {
     readonly List<IReferee> _inferiors;

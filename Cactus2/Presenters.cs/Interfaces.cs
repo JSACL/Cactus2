@@ -1,13 +1,6 @@
 #nullable enable
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using Nonno.Assets;
-using Nonno.Assets.Presentation;
-using Transform = Nonno.Assets.Presentation.Transform;
 
+namespace Cactus2.Presenter;
 public interface IVariablePresenter
 {
     event Action? PropertyChanged;

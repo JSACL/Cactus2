@@ -1,5 +1,4 @@
-using Nonno.Assets;
-
+namespace Cactus2;
 public class Effect : Typed.Object
 {
     public Authority Authority { get; set; }

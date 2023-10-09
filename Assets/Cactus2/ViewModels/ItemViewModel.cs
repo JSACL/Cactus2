@@ -1,8 +1,7 @@
 #nullable enable
 
-using System;
+using Cactus2.Presenter;
 using TMPro;
-using UnityEngine;
 
 public class ItemViewModel : ViewModel<IItemPresenter>
 {

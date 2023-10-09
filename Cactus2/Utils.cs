@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using Nonno.Assets;
-using Nonno.Assets.Collections;
 
-public static class Cactus2Utils
+namespace Cactus2;
+public static class Utils
 {
     public static DynamicMask.Provider LayerMaskProvider { get; }
 
-    static Cactus2Utils()
+    static Utils()
     {
         LayerMaskProvider = new();
         LayerMaskProvider.Preserve(0b0000_0000_0001_1111);

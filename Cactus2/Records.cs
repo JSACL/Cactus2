@@ -1,8 +1,6 @@
-﻿using System;
-using System.ComponentModel;
-using System.Numerics;
-using Nonno.Assets;
+﻿using System.ComponentModel;
 
+namespace Cactus2;
 public readonly struct InputEventArgs
 {
     public Action Action { get; }

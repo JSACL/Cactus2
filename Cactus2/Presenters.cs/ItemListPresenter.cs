@@ -1,7 +1,7 @@
 #nullable enable
 using System.Collections.Generic;
-using Nonno.Assets;
 
+namespace Cactus2.Presenter;
 public class ItemListPresenter<TModel> : Presenter<TModel>, IFamilyPresenter where TModel : SysGC::ICollection<IItem>
 {
     readonly List<ItemPresenter<IItem>> _children;

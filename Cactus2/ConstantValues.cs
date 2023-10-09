@@ -1,3 +1,4 @@
+namespace Cactus2;
 public static class ConstantValues
 {
     public const string A_N_MOV_FORWARD = "MoveForward";

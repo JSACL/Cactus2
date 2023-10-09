@@ -4,7 +4,6 @@
 // 2013/06/07 N.Kobyasahi
 //
 using UnityEngine;
-using System.Collections;
 
 namespace UnityChan
 {

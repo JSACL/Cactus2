@@ -1,8 +1,7 @@
 #nullable enable
-using System;
 using System.Numerics;
-using Assets.Cactus2;
 
+namespace Cactus2;
 public class HomingBullet : Bullet, IViewer
 {
     readonly Sphere _view;

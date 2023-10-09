@@ -1,8 +1,8 @@
 #nullable enable
 using System.Numerics;
-using Nonno.Assets.Presentation;
 using static System.MathF;
 
+namespace Cactus2.Presenter;
 public class EntityPresenter<TModel> : Presenter<TModel>, IEntityPresenter where TModel : IEntity
 {
     public bool Lerp { get; set; } = true;

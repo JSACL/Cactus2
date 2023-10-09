@@ -1,5 +1,4 @@
-using Nonno.Assets.Presentation;
-
+namespace Cactus2.Presenter;
 public class WeaponPresenter<TModel> : ItemPresenter<TModel>, IWeaponPresenter where TModel : IWeapon
 {
     public float Value1 => Model.CooldownTimeRemaining / Model.CooldownTime;

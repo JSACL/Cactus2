@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Nonno.Assets;
+using Cactus2;
+using Cactus2.Presenter;
 using UnityEngine;
-using static Utils;
 using Time = UnityEngine.Time;
 
 public class CombatUIViewModel : ViewModel<ICombatUIPresenter>

@@ -1,7 +1,5 @@
 #nullable enable
-using System;
 using System.Diagnostics.CodeAnalysis;
-using Nonno.Assets;
 using UnityEngine;
 
 public class ViewModel<TModel> : MonoBehaviour, IViewModel<TModel> where TModel : class

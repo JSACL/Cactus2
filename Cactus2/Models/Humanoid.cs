@@ -1,13 +1,9 @@
 #nullable enable
-using static Cactus2Utils;
-using static ConstantValues;
-using static System.MathF;
 using static System.Math;
 using System.Threading.Tasks;
-using System;
 using System.Numerics;
-using Assets.Cactus2;
 
+namespace Cactus2;
 public class Humanoid : Animal, IHumanoid
 {
     public const float FORCE_REDUCTION_RATE_PER_SEC = 0.001f;

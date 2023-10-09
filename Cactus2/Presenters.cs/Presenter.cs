@@ -1,8 +1,7 @@
 #nullable enable
-using System;
 using System.Diagnostics.CodeAnalysis;
-using Nonno.Assets.Presentation;
 
+namespace Cactus2.Presenter;
 public class Presenter<TModel> : IPresenter<TModel>, IVariablePresenter
 {
     TModel? _model;

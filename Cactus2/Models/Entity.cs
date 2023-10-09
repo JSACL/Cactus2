@@ -1,10 +1,7 @@
 #nullable enable
-using System;
-using static System.MathF;
-using static Cactus2Utils;
-using Nonno.Assets;
-using Nonno.Assets.Presentation;
 using System.Numerics;
+
+namespace Cactus2;
 
 public class Entity : IEntity
 {

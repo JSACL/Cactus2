@@ -1,3 +1,4 @@
+namespace Cactus2.Presenter;
 public class ItemPresenter<TModel> : Presenter<TModel>, IItemPresenter where TModel : IItem
 {
     public string Name => Model.Name;

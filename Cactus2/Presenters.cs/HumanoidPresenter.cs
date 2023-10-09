@@ -1,8 +1,7 @@
 #nullable enable
-using System;
 using System.Numerics;
-using Nonno.Assets;
 
+namespace Cactus2.Presenter;
 public class HumanoidPresenter<TModel> : EntityPresenter<TModel>, IHumanoidPresenter where TModel : IHumanoid
 {
     public HumanoidPresenter()

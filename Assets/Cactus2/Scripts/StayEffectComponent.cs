@@ -1,7 +1,5 @@
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using Nonno.Assets;
+using Cactus2;
 using UnityEngine;
 
 public class StayEffectComponent : SCComponent

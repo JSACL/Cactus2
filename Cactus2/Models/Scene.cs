@@ -1,9 +1,7 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using Nonno.Assets;
+using Cactus2.Presenter;
 
+namespace Cactus2;
 public class Scene : IScene, IFamilyPresenter
 {
     //readonly List<IVisitor> _visitors;

@@ -1,11 +1,7 @@
 #nullable enable
-using System;
 using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
-using static ConstantValues;
-using static Cactus2Utils;
 
+namespace Cactus2;
 public class Player : Humanoid, IPlayer
 {
     int _itemNumber;

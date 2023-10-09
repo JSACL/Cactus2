@@ -1,11 +1,10 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using static Unity.VisualScripting.Antlr3.Runtime.Tree.TreeWizard;
 using vec = System.Numerics.Vector3;
 using qtn = System.Numerics.Quaternion;
+using Cactus2;
+using Scene = Cactus2.Scene;
 
 public class SuperintendentComponent : MonoBehaviour
 {

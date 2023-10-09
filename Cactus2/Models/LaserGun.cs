@@ -1,9 +1,8 @@
 #nullable enable
 
-using System;
-using Nonno.Assets;
 using System.Numerics;
 
+namespace Cactus2;
 public class LaserGun : Weapon
 {
     Laser? _laserHavingFired;
@@ -49,7 +48,7 @@ public class LaserGun : Weapon
     {
         var v = TargetPosition - Transform.Position;
         var v_n = Vector3.Normalize(v);
-        var r = Cactus2Utils.LookRotation(v, Vector3.UnitZ);
+        var r = Utils.LookRotation(v, Vector3.UnitZ);
         Transform = new(Transform.Position, r);
         Scene.Add(_laserHavingFired = new Laser(Scene)
         {

@@ -1,4 +1,4 @@
-using Nonno.Assets;
+using Cactus2.Presenter;
 using Nonno.Assets.Collections;
 
 public class FootViewModel : ViewModel<ITargetPresenter>, ICommand

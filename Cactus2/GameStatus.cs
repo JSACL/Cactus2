@@ -1,7 +1,4 @@
-using System;
-using Nonno.Assets;
-
-#nullable enable
+namespace Cactus2;
 public class GameStatus : IStatus
 {
     float _hp;

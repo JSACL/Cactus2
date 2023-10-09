@@ -10,11 +10,10 @@
 //           Y.Ebata
 //
 using UnityEngine;
-using System.Collections;
 
 namespace UnityChan
 {
-	public class SpringManager : MonoBehaviour
+    public class SpringManager : MonoBehaviour
 	{
 		//Kobayashi
 		// DynamicRatio is paramater for activated level of dynamic animation 

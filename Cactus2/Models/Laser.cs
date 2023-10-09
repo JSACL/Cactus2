@@ -1,7 +1,6 @@
 #nullable enable
-using System;
-using System.Threading.Tasks;
 
+namespace Cactus2;
 public class Laser : Entity, ILaser
 {
     readonly DateTime _due;

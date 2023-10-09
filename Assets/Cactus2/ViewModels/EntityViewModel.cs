@@ -1,10 +1,7 @@
 #nullable enable
-using System;
 using UnityEngine;
-using static Utils;
-using static System.MathF;
-using vec = UnityEngine.Vector3;
 using UE = UnityEngine;
+using Cactus2.Presenter;
 
 public class EntityViewModel : EntityViewModel<IEntityPresenter>
 {

@@ -1,4 +1,4 @@
-using Nonno.Assets;
+using Cactus2;
 using UnityEngine;
 
 public class EnterEffectComponent : SCComponent

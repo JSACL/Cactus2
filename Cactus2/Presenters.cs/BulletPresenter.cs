@@ -1,7 +1,6 @@
 #nullable enable
-using System;
-using Nonno.Assets;
 
+namespace Cactus2.Presenter;
 public class BulletPresenter<TModel> : RigidbodyPresenter<TModel>, IBulletPresenter where TModel : IBullet
 {
     public bool IsSticky { get; set; }

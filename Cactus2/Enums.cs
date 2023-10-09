@@ -1,5 +1,4 @@
-using System;
-
+namespace Cactus2;
 public enum ColliderFlug : sbyte
 {
     Stay = 0,

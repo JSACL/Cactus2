@@ -7,11 +7,10 @@
 //https://twitter.com/ricopin416
 //
 using UnityEngine;
-using System.Collections;
 
 namespace UnityChan
 {
-	public class RandomWind : MonoBehaviour
+    public class RandomWind : MonoBehaviour
 	{
 		private SpringBone[] springBones;
 		public bool isWindActive = true;

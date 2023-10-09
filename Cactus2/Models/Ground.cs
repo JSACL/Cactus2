@@ -1,3 +1,4 @@
+namespace Cactus2;
 public class Ground : Entity, IGround
 {
     public override IScene Scene

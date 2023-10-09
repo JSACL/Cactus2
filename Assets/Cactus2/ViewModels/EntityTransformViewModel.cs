@@ -1,5 +1,5 @@
+using Cactus2;
 using UnityEngine;
-using static Utils;
 
 public class EntityTransformViewModel : ViewModel<IEntity>
 {

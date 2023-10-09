@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using vec = System.Numerics.Vector3;
 using qtn = System.Numerics.Quaternion;
+using Cactus2;
 
 [RequireComponent(typeof(SceneViewModel))]
 public class EntryPointComponent : MonoBehaviour

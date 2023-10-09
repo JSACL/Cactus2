@@ -1,8 +1,7 @@
 #nullable enable
-using System;
 using System.Collections.Generic;
-using Nonno.Assets;
 
+namespace Cactus2;
 public class TeamGameReferee : IReferee 
 {
     readonly CorrespondenceTable<Authority, Team> _teams;

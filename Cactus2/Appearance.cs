@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using Nonno.Assets;
-using Nonno.Assets.Presentation;
-
+﻿namespace Cactus2;
 public readonly struct Appearance
 {
     public Appearance(int hashCode, Transform transform, Displacement velocity, Authority authority)

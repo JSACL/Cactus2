@@ -1,7 +1,7 @@
 #nullable enable
 
-using Nonno.Assets.Presentation;
 
+namespace Cactus2.Presenter;
 public class RigidbodyPresenter<TModel> : EntityPresenter<TModel>, IRigidbodyPresenter where TModel : IEntity
 {
     public RigidbodyPresenter()

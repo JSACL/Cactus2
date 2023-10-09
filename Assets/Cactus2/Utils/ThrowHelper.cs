@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using Newtonsoft.Json.Linq;
 
 public static class ThrowHelper
 {

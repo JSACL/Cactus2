@@ -1,5 +1,6 @@
 #nullable enable
 
+using Cactus2;
 using UnityEngine;
 
 public readonly struct ColliderEventArgs

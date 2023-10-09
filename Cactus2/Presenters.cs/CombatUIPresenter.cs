@@ -1,8 +1,7 @@
 #nullable enable
 
-using Nonno.Assets;
-using Nonno.Assets.Presentation;
 
+namespace Cactus2.Presenter;
 public class CombatUIPresenter<TModel> : Presenter<TModel>, ICombatUIPresenter where TModel : IPlayer
 {
     public CombatUIPresenter()
