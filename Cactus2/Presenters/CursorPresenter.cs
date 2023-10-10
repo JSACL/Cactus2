@@ -1,4 +1,4 @@
-namespace Cactus2.Presenter;
+namespace Cactus2.Presenters;
 public class CursorPresenter<TModel> : Presenter<TModel>
 {
 

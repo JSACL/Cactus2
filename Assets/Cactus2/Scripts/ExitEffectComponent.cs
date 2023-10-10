@@ -7,7 +7,7 @@ public class ExitEffectComponent : SCComponent
 
     private void OnCollisionExit(Collision collision)
     {
-        if (Effect.IsValid)
+        if (Effect is { } && Effect.IsValid)
         {
             var tC = collision.gameObject.GetComponentSC<TargetComponent>();
             if (tC != null) tC.Affect(Effect);
@@ -16,7 +16,7 @@ public class ExitEffectComponent : SCComponent
 
     private void OnTriggerExitr(Collider other)
     {
-        if (Effect.IsValid)
+        if (Effect is { } && Effect.IsValid)
         {
             var tC = other.gameObject.GetComponentSC<TargetComponent>();
             if (tC != null) tC.Affect(Effect);

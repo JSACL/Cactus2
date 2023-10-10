@@ -1,5 +1,5 @@
 #nullable enable
-using Cactus2.Presenter;
+using Cactus2.Presenters;
 
 public class Species1ViewModel : RigidbodyViewModel<IRigidbodyPresenter>
 {

@@ -43,7 +43,7 @@ public class ViewModel<TModel> : MonoBehaviour, IViewModel<TModel> where TModel 
 
     protected void Awake()
     {
-        gameObject.SetActive(false);
+        gameObject.SetActive(_model is { });
     }
 
     protected virtual void Connect() { }

@@ -1,7 +1,7 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
 
-namespace Cactus2.Presenter;
+namespace Cactus2.Presenters;
 public class Presenter<TModel> : IPresenter<TModel>, IVariablePresenter
 {
     TModel? _model;

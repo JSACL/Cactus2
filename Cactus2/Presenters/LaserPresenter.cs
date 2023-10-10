@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-namespace Cactus2.Presenter;
+namespace Cactus2.Presenters;
 public class LaserPresenter<TModel> : RigidbodyPresenter<TModel>, ILaserPresenter where TModel : ILaser
 {
     public float Length => Model.Length;

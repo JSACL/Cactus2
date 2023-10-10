@@ -1,11 +1,12 @@
 #nullable enable
+using System.Diagnostics;
 using System.Numerics;
 using static System.MathF;
 
-namespace Cactus2.Presenter;
+namespace Cactus2.Presenters;
 public class EntityPresenter<TModel> : Presenter<TModel>, IEntityPresenter where TModel : IEntity
 {
-    public bool Lerp { get; set; } = true;
+    public bool Lerp { get; set; } = false;
     public float PositionAdjustmentPromptness { get; set; } = 3f;
     public float RotationAdjustmentPromptness { get; set; } = 20f;
     public Transform Transform { get; protected set; }

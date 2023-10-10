@@ -1,6 +1,6 @@
 #nullable enable
 
-namespace Cactus2.Presenter;
+namespace Cactus2.Presenters;
 public class BulletPresenter<TModel> : RigidbodyPresenter<TModel>, IBulletPresenter where TModel : IBullet
 {
     public bool IsSticky { get; set; }

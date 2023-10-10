@@ -4,14 +4,14 @@ using UnityEngine;
 using vec = System.Numerics.Vector3;
 using qtn = System.Numerics.Quaternion;
 using Cactus2;
-using Scene = Cactus2.Scene;
+using Sn = Cactus2.Scene;
 
 public class SuperintendentComponent : MonoBehaviour
 {
     public bool @break;
     public SceneViewModel scene;
 
-    Scene _scene;
+    Sn _scene;
     TeamGameReferee _referee;
     //IVisitor _visitor;
 
@@ -19,7 +19,7 @@ public class SuperintendentComponent : MonoBehaviour
     {
         TaskScheduler.UnobservedTaskException += (sender, e) => Debug.LogError(e);
 
-        _scene = new Scene(DateTime.Now, _referee = new TeamGameReferee());
+        _scene = new Sn(DateTime.Now, _referee = new TeamGameReferee());
         scene.Model = _scene;
         //var s_d = SceneManager.GetSceneByName("GeneratedScene");
 
@@ -61,6 +61,7 @@ public class SuperintendentComponent : MonoBehaviour
         t_f.Regard(t_e, @as: TeamRelationShip.Enemy);
         t_e.Regard(t_f, @as: TeamRelationShip.Enemy);
 
+        var g = new Ground(_scene);
         var p = new Player(_scene)
         {
             Authority = t_f.Player,

@@ -1,4 +1,4 @@
-namespace Cactus2.Presenter;
+namespace Cactus2.Presenters;
 public class WeaponPresenter<TModel> : ItemPresenter<TModel>, IWeaponPresenter where TModel : IWeapon
 {
     public float Value1 => Model.CooldownTimeRemaining / Model.CooldownTime;

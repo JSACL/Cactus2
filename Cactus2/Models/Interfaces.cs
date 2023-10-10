@@ -36,6 +36,7 @@ public interface IFamily
 
 public interface IScene : ITransitory, IFamily
 {
+    event FamilyChangeEventHandler? SceneChanged;
     IReferee Referee { get; }
 }
 
@@ -109,11 +110,11 @@ public interface IHumanoid : IAnimal, IViewer
     }
     void Seek(Vector3 direction_local);
     void Jump(float strength);
-    void Turn(float horizontal, float vertical)
+    void Turn(float yaw, float pitch)
     {
         var a = Vector3.Transform(Vector3.UnitZ, HeadRotation);
-        if (a.X is < 1.5f and > -1.5f || (a.X > 0 && vertical < 0) || (a.X < 0 && vertical > 0))            HeadRotation = Quaternion.CreateFromAxisAngle(Vector3.UnitX, vertical) * HeadRotation;
-        Rotate(horizontal, Vector3.UnitY);
+        if (a.X is < 1.5f and > -1.5f || (a.X > 0 && pitch < 0) || (a.X < 0 && pitch > 0))            HeadRotation = Quaternion.CreateFromAxisAngle(Vector3.UnitX, pitch) * HeadRotation;
+        Rotate(yaw, Vector3.UnitY);
     }
 }
 

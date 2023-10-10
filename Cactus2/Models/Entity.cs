@@ -1,4 +1,5 @@
 #nullable enable
+using System.Diagnostics;
 using System.Numerics;
 
 namespace Cactus2;
@@ -81,6 +82,7 @@ public class Entity : IEntity
     {
         _time = scene.Time;
         _authority = Authority.Unknown;
+        _scene = null!;
 
         Scene = scene;
         Mass = 10;

@@ -1,6 +1,6 @@
 #nullable enable
 using UnityEngine;
-using Cactus2.Presenter;
+using Cactus2.Presenters;
 
 public class RigidbodyViewModel<TModel> : ViewModel<TModel> where TModel : class, IRigidbodyPresenter
 {

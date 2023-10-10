@@ -2,6 +2,7 @@
 using static System.Math;
 using System.Threading.Tasks;
 using System.Numerics;
+using System.Diagnostics;
 
 namespace Cactus2;
 public class Humanoid : Animal, IHumanoid
@@ -113,13 +114,14 @@ public class Humanoid : Animal, IHumanoid
         {
             float ADJUSTMENT_PROMPTNESS = 1.0f;
 
-            Matrix4x4 matrix = Matrix4x4.CreateFromQuaternion(Transform.Rotation);
-            Matrix4x4.Decompose(matrix, out var scale, out var rotation, out var translation);
-            Vec axis = new Vec(rotation.X, rotation.Y, rotation.Z);
-            Vec gap = axis - Vec.UnitY;
+            var rotation = Transform.Rotation;
+            Vec axis = Vec.Normalize(new Vec(rotation.X, rotation.Y, rotation.Z));
+            Vec gap = axis - Vec.UnitZ;
 
-            Velocity = new(Velocity.Linear, ADJUSTMENT_PROMPTNESS * gap);
-            
+            Debug.WriteLine(rotation + "    " + gap);
+            //Velocity = new(Velocity.Linear, ADJUSTMENT_PROMPTNESS * gap);
+            //Transform = new (Transform.Position, Quaternion.Identity);
+
             Impulse(Transform.Position, deltaTime * Vec.Transform(Force_leg, Transform.Rotation));
         }
         else

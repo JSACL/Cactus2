@@ -1,6 +1,6 @@
 #nullable enable
 
-using Cactus2.Presenter;
+using Cactus2.Presenters;
 using TMPro;
 
 public class ItemViewModel : ViewModel<IItemPresenter>

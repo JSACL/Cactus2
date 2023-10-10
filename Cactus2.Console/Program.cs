@@ -1,8 +1,12 @@
 ﻿using Cactus2.Views;
 using Cactus2;
 
-Console.WriteLine("Hello World!");
-
 var p = new Cactus2.Program();
-new ConsoleSceneView().Model = p.Scene;
+var v = new ConsoleSceneView();
+v.Model = p.Scene;
 p.StartGame();
+
+var t = new Timer(_ =>
+{
+    v.Update();
+}, null, 1000, 2000);

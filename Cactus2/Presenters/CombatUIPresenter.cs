@@ -1,7 +1,7 @@
 #nullable enable
 
 
-namespace Cactus2.Presenter;
+namespace Cactus2.Presenters;
 public class CombatUIPresenter<TModel> : Presenter<TModel>, ICombatUIPresenter where TModel : IPlayer
 {
     public CombatUIPresenter()

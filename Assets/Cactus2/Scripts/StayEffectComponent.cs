@@ -34,7 +34,7 @@ public class StayEffectComponent : SCComponent
 
     private void Update()
     {
-        if (!Effect.IsValid) return;
+        if (Effect is null || !Effect.IsValid) return;
 
         foreach (var target in _targets)
         {

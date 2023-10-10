@@ -26,7 +26,7 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: 105811390d205c643bafa2ae79e79769
-    m_Address: Assets/Cactus2/Views/Plane.prefab
+    m_Address: Assets/Cactus2/Views/Ground.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: 6be4d4000c2dbab4eb781050ca0cd596

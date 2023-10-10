@@ -1,7 +1,7 @@
 #nullable enable
 using UnityEngine;
 using UE = UnityEngine;
-using Cactus2.Presenter;
+using Cactus2.Presenters;
 
 public class EntityViewModel : EntityViewModel<IEntityPresenter>
 {

@@ -1,6 +1,6 @@
 #nullable enable
 
-namespace Cactus2.Presenter;
+namespace Cactus2.Presenters;
 public interface IVariablePresenter
 {
     event Action? PropertyChanged;
@@ -63,10 +63,16 @@ public interface ILaserPresenter : IRigidbodyPresenter
     void Hit(Typed info);
 }
 
-public interface IHumanoidPresenter : IEntityPresenter, IAnimationPresenter
+public interface IHumanoidPresenter : IEntityPresenter, IAnimationPresenter, IFamilyPresenter
 {
     IFootPresenter FootPresenter { get; }
     IHeadPresenter HeadPresenter { get; }
+}
+
+public interface IControllerPresenter : IEntityPresenter
+{
+    ReadOnlySpan<ExternalInterruption> ValidInterruptions { get; }
+    void Interrupt(ExternalInterruption interruption);  
 }
 
 [Obsolete]

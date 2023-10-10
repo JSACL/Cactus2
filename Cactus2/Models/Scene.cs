@@ -1,14 +1,13 @@
 #nullable enable
-using Cactus2.Presenter;
+using Cactus2.Presenters;
 
 namespace Cactus2;
-public class Scene : IScene, IFamilyPresenter
+public class Scene : IScene
 {
     //readonly List<IVisitor> _visitors;
     DateTime _time;
-    int _count;
 
-    public event FamilyChangeEventHandler? FamilyChanged;
+    public event FamilyChangeEventHandler? SceneChanged;
 
     public DateTime Time { get => _time; set => _time = value; }
     public IReferee Referee { get; set; }
@@ -21,8 +20,8 @@ public class Scene : IScene, IFamilyPresenter
         Referee = referee ?? new SuperiorReferee();
     }
 
-    public void Add(Typed obj) => FamilyChanged?.Invoke(this, new(SceneChangeAction.Add, obj));
-    public void Remove(Typed obj) => FamilyChanged?.Invoke(this, new(SceneChangeAction.Remove, obj));
+    public void Add(Typed obj) => SceneChanged?.Invoke(this, new(SceneChangeAction.Add, obj));
+    public void Remove(Typed obj) => SceneChanged?.Invoke(this, new(SceneChangeAction.Remove, obj));
 
     //public void Add(object obj, bool assertIsNotVisible = false)
     //{

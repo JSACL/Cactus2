@@ -1,7 +1,7 @@
 #nullable enable
 
 
-namespace Cactus2.Presenter;
+namespace Cactus2.Presenters;
 public class RigidbodyPresenter<TModel> : EntityPresenter<TModel>, IRigidbodyPresenter where TModel : IEntity
 {
     public RigidbodyPresenter()
